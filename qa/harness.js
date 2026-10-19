@@ -381,7 +381,7 @@ if (require.main === module) {
     assert(run.rank && typeof run.rank === "string", "rank missing");
     pump(w, 5, 16.7);
     assert(!w.document.getElementById("screen-over").classList.contains("hidden"), "game-over screen never shown");
-    assert(w.document.getElementById("over-stats").children.length === 10, "stat block incomplete");
+    assert(w.document.getElementById("over-stats").children.length === 11, "stat block incomplete");
     assert(BP.Records.runs >= 1, "run was not recorded");
     assert(env.errors.length === 0, "errors during death flow:\n" + env.errors.join("\n"));
   });
@@ -428,7 +428,7 @@ if (require.main === module) {
       pump(w, 20, 16.7);
     }
     assert(guard < 400, "exit never opened after clearing waves");
-    assert(run.coresGot >= run.coresNeed, "cores not counted: " + run.coresGot + "/" + run.coresNeed);
+    assert(run.coresGot === run.coresNeed, "core objective over/under-counted: " + run.coresGot + "/" + run.coresNeed);
     assert(run.exit.open, "lift did not open");
     // walk into the lift
     const sector0 = run.sector;
@@ -452,7 +452,7 @@ if (require.main === module) {
   });
 
   /* ---- T9: every module applies without breaking state ---- */
-  check("all 18 modules apply cleanly", () => {
+  check("all 19 modules apply cleanly", () => {
     const w = env.window, BP = w.__BP;
     for (const m of BP.MODULES) {
       const fresh = { player: null };
@@ -476,7 +476,7 @@ if (require.main === module) {
   });
 
   /* ---- T10: every enemy type behaves ---- */
-  check("all four enemy archetypes update, attack and die", () => {
+  check("all four standard enemy archetypes update, attack and die", () => {
     const w = env.window, BP = w.__BP;
     BP.api.startRun(); pump(w, 60, 16.7);
     const run = BP.G.run;
@@ -571,7 +571,7 @@ if (require.main === module) {
     assert(BP.G.mode === "win", "expected win mode, got " + BP.G.mode);
     assert(!w.document.getElementById("screen-win").classList.contains("hidden"), "victory screen never shown");
     pump(w, 60, 16.7);
-    assert(w.document.getElementById("win-stats").children.length === 10, "victory stats incomplete");
+    assert(w.document.getElementById("win-stats").children.length === 11, "victory stats incomplete");
   });
 
   /* ---- T13: canvas hygiene — no NaN geometry, sane draw-call volume ---- */
@@ -770,6 +770,203 @@ if (require.main === module) {
     assert(unlocks.brood === 5, "brood unlock " + unlocks.brood);
     assert(BP.api.sectorSubtitle(1).length > 3, "sector subtitle missing");
     assert(BP.api.rankFor(1e9) === "S+" && BP.api.rankFor(0) === "E", "rank table broken");
+  });
+
+  /* ---- T19b: no timer-based transitions ---- */
+  check("REGRESSION: the game has no setTimeout-driven transitions", () => {
+    const src = fs.readFileSync(HTML, "utf8");
+    assert(!/\bsetTimeout\s*\(/.test(src), "found a wall-clock timer in the game source");
+    assert(src.includes("function beginDeath") && src.includes("deathT"),
+      "death presentation must be simulation-clock driven");
+  });
+
+  /* ---- T20: persistent armory, settings, achievements screen ---- */
+  check("EXPANSION: hangar renders all permanent upgrades and saves purchases", () => {
+    const x = boot({ w: 1366, h: 768 }), w = x.window, BP = w.__BP;
+    w.document.getElementById("btn-hangar").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    pump(w, 2);
+    assert(BP.G.mode === "hangar", "armory button did not open the hangar");
+    assert(w.document.querySelectorAll("#hangar-content .hangar-card").length === BP.ARSENAL.length,
+      "armory card count does not match upgrade tree");
+    w.document.querySelector('[data-hangar-tab="achievements"]').click();
+    assert(w.document.querySelectorAll("#hangar-content .hangar-card").length === BP.ACHIEVEMENTS.length,
+      "achievement dossier is incomplete");
+    w.document.querySelector('[data-hangar-tab="records"]').click();
+    BP.Profile.salvage = 1000;
+    assert(BP.Profile.spend("hp"), "could not purchase plating");
+    assert(BP.Profile.spend("start"), "could not unlock a starting weapon");
+    BP.Profile.prefs.startWeapon = "lance";
+    BP.Profile.save();
+    BP.api.startRun();
+    const p = BP.G.run.player;
+    assert(p.maxHp === 112 && p.hp === 112, "plating upgrade not applied: " + p.hp + "/" + p.maxHp);
+    assert(p.weapon === "lance", "loadout bay did not set the starting weapon");
+    const saved = JSON.parse(w.localStorage.getItem("blackout-protocol-profile-v2"));
+    assert(saved.upgrades.hp === 1 && saved.upgrades.start === 1, "armory did not persist upgrades");
+    assert(w.localStorage.getItem("blackout-protocol-records-v1"), "legacy high-score record no longer mirrors");
+    assert(x.errors.length === 0, "hangar errors:\n" + x.errors.join("\n"));
+    w.close();
+  });
+
+  /* ---- T21: biomes, hazards and changing sector rules ---- */
+  check("EXPANSION: all biome hazards generate and protocol modifiers scale waves", () => {
+    const x = boot({ w: 1280, h: 720 }), w = x.window, BP = w.__BP;
+    BP.api.startRun(); pump(w, 2);
+    const run = BP.G.run;
+    for (let sector = 1; sector <= BP.CFG.MAX_SECTOR; sector++) {
+      run.sector = sector;
+      BP.api.generateSector(run);
+      assert(run.theme && BP.THEMES[run.theme.id], "no biome at S" + sector);
+      assert(run.hazards.length > 0, "no hazards generated at S" + sector + " (" + run.theme.name + ")");
+      assert(run.hazards.every(h => h.def.id === run.theme.hazard), "hazard does not match biome at S" + sector);
+      for (const h of run.hazards) {
+        assert(Number.isFinite(h.x) && Number.isFinite(h.y) && h.x > 0 && h.y > 0, "bad hazard geometry");
+      }
+      BP.api.updateHazards(run, 0.05);
+      BP.api.render();
+    }
+    run.sector = 5; run.wave = 2; run.mod = {};
+    const base = BP.api.spawnEnemy(run, "lurker", 820, 640, {});
+    const baseHp = base.maxHp;
+    run.enemies.length = 0;
+    run.mod = BP.SECTOR_MODS.find(m => m.id === "carapace");
+    const plated = BP.api.spawnEnemy(run, "lurker", 820, 640, {});
+    assert(Math.abs(plated.maxHp / baseHp - 1.28) < 1e-6, "CARAPACE did not scale hostile integrity");
+    run.enemies.length = 0; run.mod = BP.SECTOR_MODS.find(m => m.id === "swarm");
+    run.wave = 2; BP.api.startWave(run);
+    const expected = Math.round(BP.api.waveComposition(5, 2).count * 1.32);
+    assert(run.waveBudget === expected, "SWARM wave count mismatch: " + run.waveBudget + " != " + expected);
+    assert(x.errors.length === 0, "biome/protocol errors:\n" + x.errors.slice(0, 6).join("\n"));
+    w.close();
+  });
+
+  /* ---- T22: three secondary modes + temporary pickup power-ups ---- */
+  check("EXPANSION: energy alt-fires, Aegis intercepts, and pickups buff the suit", () => {
+    const x = boot({ w: 1280, h: 720 }), w = x.window, BP = w.__BP;
+    BP.api.startRun(); pump(w, 3);
+    let run = BP.G.run, p = run.player;
+    p.invuln = 999; p.x = 1200; p.y = 900; p.lampOn = false; p.weapon = "pulse";
+    run.cam.x = p.x; run.cam.y = p.y;
+    BP.Input.mx = 640 + 300; BP.Input.my = 360;
+    const target = BP.api.spawnEnemy(run, "lurker", p.x + 180, p.y, {});
+    target.spawnT = 0; target.vx = target.vy = 0;
+    const hp0 = target.hp, energy0 = p.energy;
+    BP.Input.altFiring = true; pump(w, 50, 16.7); BP.Input.altFiring = false; pump(w, 3, 16.7);
+    assert(target.hp < hp0 || target.dead, "SMG overcharge beam did not hit its ray target");
+    assert(p.energy < energy0, "beam consumed no energy");
+    assert(!BP.Sound.beamOn, "beam synth did not shut off after release");
+
+    p.weapon = "scatter"; p.energy = 100; p.x = 1000; p.y = 900; p.angle = 0; p.mineCd = 0;
+    BP.Input.altFiring = true; pump(w, 3, 16.7); BP.Input.altFiring = false;
+    assert(run.mines.length > 0, "Breach-12 secondary mode did not seed a mine");
+    const mine = run.mines[0]; mine.arm = 0;
+    const victim = BP.api.spawnEnemy(run, "lurker", mine.x, mine.y, {}); victim.spawnT = 0;
+    const victimHp = victim.hp; pump(w, 3, 16.7);
+    assert(!run.mines.includes(mine), "proximity mine did not detonate");
+    assert(victim.hp < victimHp || victim.dead, "mine inflicted no damage");
+
+    p.weapon = "lance"; p.energy = 100; p.shieldAng = 0;
+    BP.Input.altFiring = true; pump(w, 1, 16.7);
+    assert(p.shieldHp > 0, "Aegis shield did not deploy");
+    const px = p.hp, sx = p.x + Math.cos(p.shieldAng) * (p.r + 20), sy = p.y + Math.sin(p.shieldAng) * (p.r + 20);
+    run.bullets.push({ x: sx - 50, y: sy, px: sx - 50, py: sy, vx: 900, vy: 0,
+      dmg: 22, life: 1, t: 0, r: 5, color: "#ff7ab8", friendly: false, seek: 0, spin: 0 });
+    pump(w, 10, 16.7);
+    assert(p.hp === px, "Aegis let a hostile bolt damage integrity");
+    BP.Input.altFiring = false; pump(w, 3, 16.7);
+
+    BP.api.collect(run, { kind: "overdrive", x: p.x, y: p.y });
+    assert(p.buffDmg > 1 && p.buffDmgT >= 12, "Overdrive pickup did not grant its timed buff");
+    BP.api.collect(run, { kind: "barrier", x: p.x, y: p.y });
+    const barrierHp = p.hp;
+    p.invuln = 0;
+    BP.api.hurtPlayer(run, 20, Math.PI, "qa shield test");
+    assert(p.hp === barrierHp && p.barrierHp === 60, "Aegis pickup did not absorb damage");
+    assert(x.errors.length === 0, "alt-fire/power-up errors:\n" + x.errors.slice(0, 6).join("\n"));
+    w.close();
+  });
+
+  /* ---- T23: Warden phases, hostile projectiles, boss-gated victory ---- */
+  check("EXPANSION: sector 10 Warden attacks in phases and gates the victory", () => {
+    const x = boot({ w: 1280, h: 720 }), w = x.window, BP = w.__BP;
+    BP.api.startRun(); pump(w, 2);
+    const run = BP.G.run;
+    run.sector = BP.CFG.MAX_SECTOR;
+    BP.api.generateSector(run); run.wave = BP.CFG.WAVES_PER_SECTOR;
+    BP.api.startWave(run);
+    const boss = run.boss;
+    assert(boss && boss.boss && run.bossActive, "final wave did not spawn the Warden");
+    boss.roar = 0; boss.atkT = 0; boss.wind = 0; run.player.invuln = 999;
+    boss.hp = boss.maxHp * 0.5;
+    pump(w, 4, 16.7);
+    assert(boss.phase === 2, "Warden did not transition to phase 2");
+    boss.atk = "radial"; boss.wind = 0.02; boss.atkT = 0.7;
+    pump(w, 12, 16.7);                          // force the documented radial tell deterministically
+    assert(run.bullets.some(b => b.friendly === false), "Warden fired no hostile projectiles");
+    pump(w, 168, 16.7);
+    for (const b of run.bullets) {
+      assert(Number.isFinite(b.x) && Number.isFinite(b.y) && Number.isFinite(b.vx) && Number.isFinite(b.vy), "bad Warden projectile");
+    }
+    BP.api.killEnemy(run, boss, {});
+    assert(run.bossDown && !run.bossActive, "boss death did not mark the encounter clear");
+    run.enemies.length = 0; run.spawners.length = 0; run.waveBudget = 0;
+    run.player.hp = run.player.maxHp;
+    pump(w, 4, 16.7);                              // wave clear creates remaining cores
+    for (const o of run.pickups) if (o.kind === "core") { o.x = run.player.x; o.y = run.player.y; }
+    pump(w, 8, 16.7);
+    assert(run.exit.open, "Warden kill did not eventually unlock the core lift");
+    run.player.x = run.exit.x; run.player.y = run.exit.y;
+    pump(w, 80, 16.7);
+    assert(BP.G.mode === "win" && run.won, "boss-gated sector 10 did not reach victory");
+    assert(BP.Profile.wins >= 1 && BP.Profile.has("boss") && BP.Profile.has("win"), "victory was not persisted to the profile");
+    const calls = w.document.getElementById("game").__ctx.__calls;
+    assert(calls.badNumbers.length === 0, "Warden renderer emitted bad geometry: " + calls.badNumbers.join(", "));
+    assert(w.__audioLog.length === 0, "Warden audio automation invalid: " + w.__audioLog.slice(0, 5).join("; "));
+    assert(x.errors.length === 0, "Warden encounter errors:\n" + x.errors.slice(0, 6).join("\n"));
+    w.close();
+  });
+
+  /* ---- T24: elite affixes and unlockable citations ---- */
+  check("EXPANSION: elite affixes have distinct effects and citations pay salvage", () => {
+    const x = boot({ w: 1280, h: 720 }), w = x.window, BP = w.__BP;
+    BP.api.startRun(); pump(w, 3);
+    const run = BP.G.run, p = run.player; p.invuln = 999;
+    run.enemies.length = 0; run.waveBudget = 0; run.spawners.length = 0;
+    const armored = BP.api.spawnEnemy(run, "lurker", p.x + 500, p.y, { affixes: ["armored"] });
+    armored.spawnT = 0;
+    const hp = armored.hp;
+    BP.api.damageEnemy(run, armored, 20, 1, 0, { silent: true });
+    assert(Math.abs((hp - armored.hp) - 11) < 1e-6, "ARMOURED reduction is not 45%");
+    const volatile = BP.api.spawnEnemy(run, "brood", p.x + 550, p.y, { affixes: ["volatile"] });
+    volatile.hp = 1;
+    const rings = run.rings.length;
+    BP.api.killEnemy(run, volatile, {});
+    assert(run.rings.length > rings, "VOLATILE death did not explode");
+    const before = BP.Profile.salvage;
+    assert(BP.Profile.unlock("first"), "first-time citation was not granted");
+    assert(BP.Profile.salvage === before + 40, "citation reward was not banked");
+    assert(!BP.Profile.unlock("first"), "citation rewarded twice");
+    assert(x.errors.length === 0, "elite/citation errors:\n" + x.errors.slice(0, 6).join("\n"));
+    w.close();
+  });
+
+  /* ---- T26: an opened lift must stop future wave scheduling ---- */
+  check("REGRESSION: collecting all cores cannot loop the current wave forever", () => {
+    const x = boot({ w: 1280, h: 720 }), w = x.window, BP = w.__BP;
+    BP.api.startRun(); pump(w, 3);
+    const run = BP.G.run;
+    run.player.invuln = 999;
+    run.player.x = run.exit.x + 500; run.player.y = run.exit.y + 300;
+    run.wave = 2; run.waveActive = true; run.waveBudget = 7; run.spawnTimer = 0.01;
+    run.enemies.length = 0; run.spawners.length = 0;
+    run.coresGot = run.coresNeed = 2;
+    run.exit.open = true;
+    pump(w, 120, 16.7);
+    assert(run.wave === 2 && run.waveBudget === 7 && run.spawners.length === 0,
+      "a new wave was spawned after the lift opened (W" + run.wave + ", budget " + run.waveBudget + ")");
+    assert(run.exit.open && BP.G.mode === "playing", "the open lift was lost before player arrival");
+    assert(x.errors.length === 0, "exit scheduling errors:\n" + x.errors.join("\n"));
+    w.close();
   });
 
   console.log(results.join("\n"));
