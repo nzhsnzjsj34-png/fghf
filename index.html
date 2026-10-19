@@ -338,7 +338,7 @@ h1.title,.mtitle,h2.sub{font-family:Inter,"Aptos Display","Segoe UI",ui-sans-ser
     <hr class="rule">
     <div class="ctrls">
       <div class="ctrl"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><small>move</small></div>
-      <div class="ctrl"><kbd>MOUSE</kbd><small>aim lamp</small></div>
+      <div class="ctrl"><kbd>MOUSE</kbd><small>aim lamp + weapons</small></div>
       <div class="ctrl"><kbd>LMB</kbd><small>fire</small></div>
       <div class="ctrl"><kbd>RMB</kbd><kbd>G</kbd><small>alt-fire · energy</small></div>
       <div class="ctrl"><kbd>SHIFT</kbd><small>dash · i-frames</small></div>
@@ -348,7 +348,7 @@ h1.title,.mtitle,h2.sub{font-family:Inter,"Aptos Display","Segoe UI",ui-sans-ser
       <div class="ctrl"><kbd>T</kbd><small>lamp on/off · stealth</small></div>
       <div class="ctrl"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><small>swap weapon</small></div>
       <div class="ctrl"><kbd>F</kbd><small>cycle weapon</small></div>
-      <div class="ctrl"><kbd>ESC</kbd><small>pause</small></div>
+      <div class="ctrl"><kbd>ESC</kbd><small>pause · release mouse</small></div>
       <div class="ctrl"><kbd>M</kbd><small>mute</small></div>
       <div class="ctrl"><kbd>A</kbd><small>sector archive</small></div>
       <div class="ctrl"><kbd>N</kbd><small>new game+ if unlocked</small></div>
@@ -369,7 +369,7 @@ h1.title,.mtitle,h2.sub{font-family:Inter,"Aptos Display","Segoe UI",ui-sans-ser
       <button class="btn ghost" id="btn-hangar">HADAL Armory</button>
       <button class="btn ghost" id="btn-how">Field Manual</button>
     </div>
-    <p class="tiny" id="touch-hint">Keyboard + mouse recommended &nbsp;•&nbsp; touch controls auto-enable on mobile</p>
+    <p class="tiny" id="touch-hint">Keyboard + mouse recommended &nbsp;•&nbsp; desktop mouse captures on descent &nbsp;•&nbsp; touch controls auto-enable on mobile</p>
   </div>
 
   <!-- ============ PERMANENT HANGAR / PROFILE ============ -->
@@ -1410,6 +1410,7 @@ const Input = {
   pressed: Object.create(null),
   mx: 0, my: 0, mWorldX: 0, mWorldY: 0,
   firing: false, altFiring: false, hasMouse: false,
+  pointerLocked: false, lockAimX: 0, lockAimY: -240, mouseSensitivity: 1,
   touchMode: false,
   move: { x: 0, y: 0 },
   aim: { x: 0, y: -1, active: false },
@@ -1439,6 +1440,50 @@ function isTouchDevice() {
   return ("ontouchstart" in window) || (navigator.maxTouchPoints || 0) > 0;
 }
 
+function requestGamePointerLock() {
+  if (Input.touchMode || isTouchDevice() || typeof cv.requestPointerLock !== "function") return false;
+  try {
+    const pending = cv.requestPointerLock();
+    if (pending && typeof pending.catch === "function") pending.catch(() => {});
+    return true;
+  } catch (_) {
+    // Pointer Lock may be unavailable or denied by browser policy; absolute
+    // mouse aim remains a fully supported fallback.
+    return false;
+  }
+}
+function releaseGamePointerLock() {
+  if (document.pointerLockElement === cv && typeof document.exitPointerLock === "function") {
+    try {
+      const pending = document.exitPointerLock();
+      if (pending && typeof pending.catch === "function") pending.catch(() => {});
+    } catch (_) { /* the browser may already have released the lock */ }
+  }
+  Input.pointerLocked = false;
+  Input.firing = false;
+  Input.altFiring = false;
+}
+document.addEventListener("pointerlockchange", () => {
+  const locked = document.pointerLockElement === cv;
+  const changed = Input.pointerLocked !== locked;
+  Input.pointerLocked = locked;
+  if (locked && changed) {
+    if (G.mode !== "playing") { releaseGamePointerLock(); return; }
+    const p = G.run && G.run.player;
+    const radius = Math.max(80, Math.min(300, Math.min(VW, VH) * 0.32));
+    const angle = p ? p.angle : -Math.PI / 2;
+    Input.lockAimX = Math.cos(angle) * radius;
+    Input.lockAimY = Math.sin(angle) * radius;
+    Input.mx = VW / 2;
+    Input.my = VH / 2;
+    Input.hasMouse = true;
+  } else if (!locked) {
+    Input.firing = false;
+    Input.altFiring = false;
+  }
+});
+document.addEventListener("pointerlockerror", () => { Input.pointerLocked = false; });
+
 window.addEventListener("keydown", e => {
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "Tab"].includes(e.code)) e.preventDefault();
   if (e.repeat) { Input.keys[e.code] = true; return; }
@@ -1453,8 +1498,25 @@ window.addEventListener("blur", () => { Input.reset(); Game.onBlur(); });
 cv.addEventListener("contextmenu", e => e.preventDefault());
 
 cv.addEventListener("mousemove", e => {
-  const r = cv.getBoundingClientRect();
-  Input.mx = e.clientX - r.left; Input.my = e.clientY - r.top;
+  if (Input.pointerLocked) {
+    const dx = Number(e.movementX || e.mozMovementX || e.webkitMovementX) || 0;
+    const dy = Number(e.movementY || e.mozMovementY || e.webkitMovementY) || 0;
+    let x = Input.lockAimX + dx * Input.mouseSensitivity;
+    let y = Input.lockAimY + dy * Input.mouseSensitivity;
+    const len = Math.hypot(x, y);
+    const minRadius = 48;
+    const maxRadius = Math.max(320, Math.min(640, Math.min(VW, VH) * 0.85));
+    if (len < minRadius) {
+      const angle = Math.atan2(y, x);
+      x = Math.cos(angle) * minRadius; y = Math.sin(angle) * minRadius;
+    } else if (len > maxRadius) {
+      x *= maxRadius / len; y *= maxRadius / len;
+    }
+    Input.lockAimX = x; Input.lockAimY = y;
+  } else {
+    const r = cv.getBoundingClientRect();
+    Input.mx = e.clientX - r.left; Input.my = e.clientY - r.top;
+  }
   Input.hasMouse = true;
 });
 cv.addEventListener("mousedown", e => {
@@ -3937,6 +3999,7 @@ function advanceSector(run) {
   run.clearedSectors++;
   run.exitHold = 0;
   if (run.sector >= CFG.MAX_SECTOR) { victory(run); return; }
+  releaseGamePointerLock();
   Sound.sectorClear();
   G.flash = 1;
   G.mode = "modules";
@@ -3953,6 +4016,7 @@ function nextSectorAfterModule(run) {
   Sound.setDrone(0.1 + run.sector * 0.014);
   G.mode = "playing";
   showScreen(null);
+  requestGamePointerLock();
 }
 function sectorSubtitle(s) {
   const theme = THEMES[SECTOR_THEME[s] || "spine"];
@@ -4338,6 +4402,7 @@ function startRun(options) {
   G.timeScale = 1;
   showScreen(null);
   Input.reset();
+  requestGamePointerLock();
   const title = G.run.ngPlusTier ? "NEW GAME+  ·  TIER " + G.run.ngPlusTier : "SECTOR 1";
   const subtitle = sectorBrief(G.run) + (G.run.ngPlusTier ? " · hostile scaling increased" : "");
   showBanner(G.run, title, subtitle, G.run.theme.accent, 3.0);
@@ -4373,6 +4438,7 @@ function startArchiveRun(sector, moduleId) {
   G.timeScale = 1;
   showScreen(null);
   Input.reset();
+  requestGamePointerLock();
   showBanner(G.run, "ARCHIVE · SECTOR " + pad2(checkpoint), branch.name + " ROUTE · " + module.name + " INSTALLED · NON-RANKED", branch.color, 3.0);
   Sound.setDrone(0.12 + checkpoint * 0.01);
   Sound.uiBig();
@@ -4511,6 +4577,7 @@ function renderPostgame(prefix, run) {
 
 function gameOver(run) {
   if (G.mode === "over") return;
+  releaseGamePointerLock();
   G.mode = "over";
   run.dying = false;
   run.rank = rankFor(run.score);
@@ -4547,6 +4614,7 @@ function submitRun(run) {
 
 function victory(run) {
   if (G.mode === "win") return;
+  releaseGamePointerLock();
   G.mode = "win";
   run.won = true;
   run.ending = resolveEnding(run);
@@ -4571,6 +4639,7 @@ function victory(run) {
 }
 
 function toMenu() {
+  releaseGamePointerLock();
   G.mode = "menu";
   G.run = null;
   showScreen("screen-menu");
@@ -4598,6 +4667,7 @@ function refreshRecords() {
 
 function togglePause(force) {
   if (G.mode === "playing" && force !== false) {
+    releaseGamePointerLock();
     G.mode = "paused";
     const run = G.run, p = run.player;
     document.getElementById("p-sector").textContent = run.sector + " / " + CFG.MAX_SECTOR;
@@ -4614,6 +4684,7 @@ function togglePause(force) {
     Sound.resume();
     Sound.setDrone(0.1 + G.run.sector * 0.014);
     Input.reset();
+    requestGamePointerLock();
   }
 }
 
@@ -4724,9 +4795,15 @@ function update(dt) {
   if (G.slowTimer > 0) { G.slowTimer -= dt; scale *= 0.45; }
   const sdt = dt * scale;
 
-  // mouse -> world
-  Input.mWorldX = Input.mx + run.cam.x - VW / 2 + run.cam.shakeX;
-  Input.mWorldY = Input.my + run.cam.y - VH / 2 + run.cam.shakeY;
+  // Locked aim is a virtual world-space target moved by relative mouse deltas.
+  // When unlocked, keep the original absolute cursor-to-world mapping.
+  if (Input.pointerLocked) {
+    Input.mWorldX = p.x + Input.lockAimX;
+    Input.mWorldY = p.y + Input.lockAimY;
+  } else {
+    Input.mWorldX = Input.mx + run.cam.x - VW / 2 + run.cam.shakeX;
+    Input.mWorldY = Input.my + run.cam.y - VH / 2 + run.cam.shakeY;
+  }
 
   const lampBase = p.baseLampRange * p.lampRangeMul * ((run.mod && run.mod.lampMul) || 1);
   p.lampRange = lampBase * (1 - clamp(run.bossDrain || 0, 0, 1) * 0.48);

@@ -164,8 +164,25 @@ function boot(opts) {
       window.__setNow = v => { now = v; };
       Object.defineProperty(window.performance, "now", { value: () => now, configurable: true, writable: true });
       window.matchMedia = q => ({ matches: false, media: q, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
-      // no touch by default
+      // no touch by default; a pointer-lock test opts into a minimal browser API stub.
       Object.defineProperty(window.navigator, "maxTouchPoints", { value: 0, configurable: true });
+      if (opts.pointerLock) {
+        delete window.ontouchstart;
+        let lockedElement = null;
+        Object.defineProperty(window.document, "pointerLockElement", {
+          configurable: true, get: () => lockedElement
+        });
+        window.HTMLCanvasElement.prototype.requestPointerLock = function () {
+          lockedElement = this;
+          window.document.dispatchEvent(new window.Event("pointerlockchange"));
+          return Promise.resolve();
+        };
+        window.document.exitPointerLock = function () {
+          lockedElement = null;
+          window.document.dispatchEvent(new window.Event("pointerlockchange"));
+          return Promise.resolve();
+        };
+      }
       if (opts.storage && typeof opts.storage === "object") {
         for (const [key, value] of Object.entries(opts.storage)) window.localStorage.setItem(key, String(value));
       }
@@ -1010,7 +1027,7 @@ if (require.main === module) {
     BP1.Profile.save();
     const storedProfile = first.localStorage.getItem("blackout-protocol-profile-v2");
     const storedRecords = first.localStorage.getItem("blackout-protocol-records-v1");
-    const y = boot({ w: 1280, h: 720, storage: {
+    const y = boot({ w: 1280, h: 720, pointerLock: true, storage: {
       "blackout-protocol-profile-v2": storedProfile,
       "blackout-protocol-records-v1": storedRecords
     }});
@@ -1020,6 +1037,7 @@ if (require.main === module) {
     assert(w.document.documentElement.dataset.visualTheme === "ember", "equipped palette was not applied to the interface");
     const run = BP.api.startNewGamePlus();
     assert(run && run.ngPlusTier === 2, "New Game+ did not start at the unlocked tier");
+    assert(w.document.pointerLockElement === w.document.getElementById("game"), "New Game+ did not request pointer lock on desktop");
     assert(run.player.maxHp === 112, "persistent armory plating did not carry into NG+");
     assert(BP.api.waveComposition(5, 3, 2).count > BP.api.waveComposition(5, 3, 0).count, "NG+ did not increase wave pressure");
     run.sector = 5; run.wave = 2; run.mod = {}; run.ngPlusTier = 0;
@@ -1035,7 +1053,7 @@ if (require.main === module) {
 
   /* ---- T29: unlocked stage checkpoints, playable branch replays, no ranked farming ---- */
   check("POST-GAME: archive replays branch from unlocked sectors without altering career records", () => {
-    const x = boot({ w: 1280, h: 720 }), w = x.window, BP = w.__BP;
+    const x = boot({ w: 1280, h: 720, pointerLock: true }), w = x.window, BP = w.__BP;
     BP.Profile.bestSector = 4; BP.Profile.save();
     const before = { runs: BP.Profile.runs, wins: BP.Profile.wins, salvage: BP.Profile.salvage, ngPlus: BP.Profile.ngPlusTier };
     assert(BP.api.openArchive(), "sector archive failed to open");
@@ -1045,9 +1063,11 @@ if (require.main === module) {
     assert(w.document.querySelectorAll("#archive-branches .archive-branch").length === 5, "archive did not offer all five branch doctrines");
     const run = BP.api.startArchiveRun(4, "hp");
     assert(run && run.archive && run.sector === 4, "archive did not start the selected checkpoint");
+    assert(w.document.pointerLockElement === w.document.getElementById("game"), "archive run did not request pointer lock");
     assert(run.choiceHistory[0].branchId === "survival" && run.player.modules.includes("hp"), "archive branch starter was not applied and recorded");
     BP.api.victory(run);
     assert(BP.G.mode === "win" && BP.Profile.endings.survival, "archive victory did not reveal its route ending");
+    assert(w.document.pointerLockElement === null, "victory did not release pointer lock");
     assert(BP.Profile.runs === before.runs && BP.Profile.wins === before.wins, "archive replay altered career run counters");
     assert(BP.Profile.salvage === before.salvage && BP.Profile.ngPlusTier === before.ngPlus, "archive replay banked ranked currency or unlocked NG+");
     assert(BP.Profile.lastRun.archive === true, "archive result was not saved in the replay dossier");
@@ -1089,6 +1109,41 @@ if (require.main === module) {
       "existing sector, boss, or victory records did not grant their matching palettes");
     assert(w.document.getElementById("btn-menu-ngplus").classList.contains("hidden") === false, "migrated NG+ button is hidden");
     assert(x.errors.length === 0, "veteran profile migration errors:\n" + x.errors.join("\n"));
+    w.close();
+  });
+
+  /* ---- T32: desktop Pointer Lock lifecycle and relative mouse aiming ---- */
+  check("INPUT: run captures the desktop mouse, Escape releases it, and resume recaptures", () => {
+    const x = boot({ w: 1280, h: 720, pointerLock: true }), w = x.window, BP = w.__BP;
+    const canvas = w.document.getElementById("game");
+    w.document.getElementById("btn-start").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    const run = BP.G.run;
+    assert(BP.G.mode === "playing", "standard run did not start");
+    assert(w.document.pointerLockElement === canvas && BP.Input.pointerLocked, "standard run did not capture the game canvas");
+    const beforeX = BP.Input.lockAimX, beforeY = BP.Input.lockAimY;
+    const movement = new w.MouseEvent("mousemove", { bubbles: true });
+    Object.defineProperty(movement, "movementX", { value: 36 });
+    Object.defineProperty(movement, "movementY", { value: -18 });
+    canvas.dispatchEvent(movement);
+    assert(BP.Input.lockAimX === beforeX + 36 && BP.Input.lockAimY === beforeY - 18,
+      "relative mouse deltas did not move the virtual aim target");
+    run.player.invuln = 999;
+    BP.api.advanceSector(run);
+    assert(BP.G.mode === "modules" && w.document.pointerLockElement === null,
+      "module draft did not release the pointer so its cards can be selected");
+    BP.api.chooseModule(0);
+    assert(BP.G.mode === "playing" && w.document.pointerLockElement === canvas,
+      "choosing a module did not recapture the pointer for the next sector");
+    press(w, "Escape");
+    assert(BP.G.mode === "paused", "Escape did not preserve pause behavior");
+    assert(w.document.pointerLockElement === null && !BP.Input.pointerLocked, "Escape did not release the pointer lock");
+    release(w, "Escape");
+    press(w, "Escape");
+    assert(BP.G.mode === "playing", "Escape did not resume the run");
+    assert(w.document.pointerLockElement === canvas && BP.Input.pointerLocked, "resume did not recapture the pointer");
+    BP.api.gameOver(run);
+    assert(w.document.pointerLockElement === null && !BP.Input.pointerLocked, "game over did not release the pointer lock");
+    assert(x.errors.length === 0, "pointer lock lifecycle errors:\n" + x.errors.join("\n"));
     w.close();
   });
 
