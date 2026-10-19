@@ -20,6 +20,7 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;image
 /* ---------- shared screen chrome ---------- */
 .screen{
   position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  touch-action:pan-y;
   padding:clamp(14px,3.4vmin,40px);text-align:center;z-index:5;
   background:
     radial-gradient(120% 90% at 50% 0%,rgba(16,34,58,.62),rgba(2,4,10,.94) 62%),
@@ -205,6 +206,27 @@ kbd{
 .hangar-actions{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:8px}
 .hangar-note{font-size:10px;color:#5f83a5;letter-spacing:.1em;line-height:1.6;max-width:75ch;margin:4px auto 10px}
 #btnAlt{border-color:rgba(190,160,255,.5);color:#dccbff}
+/* ---------- system settings ---------- */
+.options-shell{width:min(960px,96vw);margin:10px auto 0}
+.options-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:12px;text-align:left}
+.option-card{min-height:132px;padding:16px;border:1px solid rgba(115,185,230,.22);border-radius:12px;background:linear-gradient(145deg,rgba(17,38,60,.94),rgba(5,13,24,.97));box-shadow:0 12px 26px rgba(0,0,0,.22)}
+.option-title{display:block;color:#ecf7ff;font:800 12px/1.3 ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+.option-help{margin:7px 0 12px;color:#91abc2;font:500 11px/1.5 Inter,"Segoe UI",sans-serif;letter-spacing:.01em}
+.option-control{display:flex;align-items:center;gap:10px}
+.option-range{flex:1;min-width:90px;min-height:34px;accent-color:var(--theme-accent);cursor:pointer}
+.option-range:focus-visible{outline:2px solid color-mix(in srgb,var(--theme-accent) 62%,white);outline-offset:3px;border-radius:999px}
+.option-value{min-width:58px;text-align:right;color:#ffd39a;font:800 11px ui-monospace,monospace}
+.option-toggle{width:100%;min-height:42px;margin:0;padding:9px 12px;border:1px solid rgba(110,190,255,.32);border-radius:8px;background:rgba(6,15,27,.88);color:#9fc0dc;font:800 10px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.option-toggle[aria-pressed="true"]{border-color:rgba(125,255,184,.55);color:#aaffcf;background:rgba(16,58,43,.55);box-shadow:0 0 20px rgba(80,255,170,.08)}
+.option-toggle:hover,.option-toggle:focus-visible{outline:2px solid color-mix(in srgb,var(--theme-accent) 60%,white);outline-offset:2px}
+.options-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:14px 0 0}
+#options-status{min-height:1.5em;margin:8px auto 0;color:#82a5c1;font-size:10px;letter-spacing:.12em}
+@media (max-width:640px){
+  .options-grid{grid-template-columns:1fr 1fr}
+  .option-card{min-height:120px;padding:12px}
+  .option-help{font-size:10px}
+}
+@media (max-width:420px){.options-grid{grid-template-columns:1fr}}
 @media (max-width:640px){
   .ctrls{grid-template-columns:1fr 1fr}
   .card{flex:1 1 100%;max-width:none}
@@ -352,6 +374,7 @@ h1.title,.mtitle,h2.sub{font-family:Inter,"Aptos Display","Segoe UI",ui-sans-ser
       <div class="ctrl"><kbd>M</kbd><small>mute</small></div>
       <div class="ctrl"><kbd>A</kbd><small>sector archive</small></div>
       <div class="ctrl"><kbd>N</kbd><small>new game+ if unlocked</small></div>
+      <div class="ctrl"><kbd>O</kbd><small>system settings</small></div>
     </div>
     <div class="records">
       <div>Best Score <b id="rec-score">0</b></div>
@@ -368,6 +391,7 @@ h1.title,.mtitle,h2.sub{font-family:Inter,"Aptos Display","Segoe UI",ui-sans-ser
       <button class="btn ghost" id="btn-archive">Sector Archive <span class="k">A</span></button>
       <button class="btn ghost" id="btn-hangar">HADAL Armory</button>
       <button class="btn ghost" id="btn-how">Field Manual</button>
+      <button class="btn ghost" id="btn-options">System Settings <span class="k">O</span></button>
     </div>
     <p class="tiny" id="touch-hint">Keyboard + mouse recommended &nbsp;•&nbsp; desktop mouse captures on descent &nbsp;•&nbsp; touch controls auto-enable on mobile</p>
   </div>
@@ -386,6 +410,19 @@ h1.title,.mtitle,h2.sub{font-family:Inter,"Aptos Display","Segoe UI",ui-sans-ser
     <div id="hangar-content"></div>
     <p class="hangar-note" id="hangar-note">Salvage earned from kills and first-time achievements is banked when a run ends. Arsenal upgrades persist between descents.</p>
     <button class="btn ghost" id="btn-hangar-back">Return to station <span class="k">ESC</span></button>
+  </div>
+
+  <!-- ============ SYSTEM SETTINGS ============ -->
+  <div id="screen-options" class="screen hidden" aria-labelledby="options-title">
+    <p class="eyebrow">HADAL-9 · PERSONAL CONFIGURATION</p>
+    <h1 class="title" id="options-title" style="font-size:clamp(26px,5.6vmin,58px)">System <span class="amber">Settings</span></h1>
+    <p class="archive-caption" style="text-align:center;max-width:72ch">Tune controls, audio and visual comfort. Settings save locally and apply immediately.</p>
+    <div class="options-shell"><div class="options-grid" id="options-grid"></div></div>
+    <div class="options-actions">
+      <button class="btn ghost" id="btn-options-reset">Restore defaults</button>
+      <button class="btn primary" id="btn-options-back">Back <span class="k">ESC</span></button>
+    </div>
+    <p class="tiny" id="options-status" role="status" aria-live="polite"></p>
   </div>
 
   <!-- ============ SECTOR / BRANCH ARCHIVE ============ -->
@@ -471,6 +508,7 @@ h1.title,.mtitle,h2.sub{font-family:Inter,"Aptos Display","Segoe UI",ui-sans-ser
     <div style="margin-top:16px">
       <button class="btn primary" id="btn-resume">Resume <span class="k">ESC</span></button>
       <button class="btn ghost" id="btn-mute">Audio: On <span class="k">M</span></button>
+      <button class="btn ghost" id="btn-pause-options">Options <span class="k">O</span></button>
       <button class="btn ghost" id="btn-abort">Abort Run</button>
     </div>
   </div>
@@ -601,7 +639,7 @@ const Sound = (() => {
   let ac = null, master = null, comp = null, noiseBuf = null;
   let droneGain = null, droneFilter = null, droneOscs = [], lfo = null;
   let beamGain = null, beamFilter = null, beamOscs = [], beamOn = false;
-  let enabled = true, musicEnabled = true, ready = false, lastPlay = Object.create(null);
+  let enabled = true, musicEnabled = true, ready = false, masterVolume = 0.85, lastPlay = Object.create(null);
 
   function noise(dur) {
     const n = Math.max(1, Math.floor(ac.sampleRate * dur));
@@ -619,7 +657,7 @@ const Sound = (() => {
     comp = ac.createDynamicsCompressor();
     comp.threshold.value = -16; comp.knee.value = 22; comp.ratio.value = 9;
     comp.attack.value = 0.003; comp.release.value = 0.22;
-    master = ac.createGain(); master.gain.value = 0.85;
+    master = ac.createGain(); master.gain.value = enabled ? masterVolume : 0;
     master.connect(comp); comp.connect(ac.destination);
     noiseBuf = noise(1.2);
     ready = true;
@@ -730,11 +768,23 @@ const Sound = (() => {
   const api = {
     init, resume,
     get enabled() { return enabled; },
-    toggle() {
-      enabled = !enabled;
-      if (ready) { master.gain.setTargetAtTime(enabled ? 0.85 : 0.0, now(), 0.05); setDrone(enabled ? droneLevel : 0); }
+    get volume() { return masterVolume; },
+    setVolume(value) {
+      const next = Number(value);
+      masterVolume = Number.isFinite(next) ? clamp(next, 0, 1) : masterVolume;
+      if (ready && master) master.gain.setTargetAtTime(enabled ? masterVolume : 0, now(), 0.04);
+      return masterVolume;
+    },
+    setEnabled(value) {
+      enabled = !!value;
+      if (ready && master) {
+        master.gain.setTargetAtTime(enabled ? masterVolume : 0, now(), 0.05);
+        setDrone(enabled ? droneLevel : 0);
+      }
       return enabled;
     },
+    toggle() { return this.setEnabled(!enabled); },
+
     set level(v) { droneLevel = v; },
     get playing() { return ready; },
 
@@ -870,7 +920,10 @@ const Profile = {
   endings: Object.create(null), lastRun: null,
   upgrades: Object.create(null),
   achievements: Object.create(null),
-  prefs: { damageNumbers: true, screenShake: 1, music: true, startWeapon: "pulse" },
+  prefs: {
+    damageNumbers: true, screenShake: 1, music: true, startWeapon: "pulse",
+    masterVolume: 0.85, soundEnabled: true, mouseSensitivity: 1, hudScale: 1, reducedFlashes: false
+  },
   ok: true,
 
   load() {
@@ -905,8 +958,16 @@ const Profile = {
         if (!["pulse", "scatter", "lance"].includes(this.prefs.startWeapon)) this.prefs.startWeapon = "pulse";
         this.prefs.damageNumbers = this.prefs.damageNumbers !== false;
         this.prefs.music = this.prefs.music !== false;
+        this.prefs.soundEnabled = this.prefs.soundEnabled !== false;
         const shakeValue = Number(this.prefs.screenShake);
         this.prefs.screenShake = Number.isFinite(shakeValue) ? clamp(shakeValue, 0, 1) : 1;
+        const volumeValue = Number(this.prefs.masterVolume);
+        this.prefs.masterVolume = Number.isFinite(volumeValue) ? clamp(volumeValue, 0, 1) : 0.85;
+        const sensitivityValue = Number(this.prefs.mouseSensitivity);
+        this.prefs.mouseSensitivity = Number.isFinite(sensitivityValue) ? clamp(sensitivityValue, 0.25, 2.5) : 1;
+        const hudScaleValue = Number(this.prefs.hudScale);
+        this.prefs.hudScale = Number.isFinite(hudScaleValue) ? clamp(hudScaleValue, 0.8, 1.25) : 1;
+        this.prefs.reducedFlashes = this.prefs.reducedFlashes === true;
         this.selectedTheme = VISUAL_THEMES[o.selectedTheme] && this.cosmetics[o.selectedTheme] ? o.selectedTheme : "ice";
       } else {
         // migrate a v1 profile if one exists
@@ -1485,11 +1546,15 @@ document.addEventListener("pointerlockchange", () => {
 document.addEventListener("pointerlockerror", () => { Input.pointerLocked = false; });
 
 window.addEventListener("keydown", e => {
-  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "Tab"].includes(e.code)) e.preventDefault();
+  const control = e.target && e.target.closest ? e.target.closest("button,input,select,textarea,a,[contenteditable='true']") : null;
+  if (!control && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) e.preventDefault();
   if (e.repeat) { Input.keys[e.code] = true; return; }
   Input.keys[e.code] = true;
   Input.pressed[e.code] = true;
   Input.hasMouse = false;
+  // Let focused native controls handle Enter/Space themselves; otherwise a
+  // focused menu button could also trigger the global gameplay shortcut.
+  if (control && ["Enter", "NumpadEnter", "Space"].includes(e.code)) return;
   Game.onKey(e.code, e);
 }, { passive: false });
 
@@ -1610,7 +1675,7 @@ for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) altButt
  * 7. GAME STATE
  * ------------------------------------------------------------------ */
 const G = {
-  mode: "menu",           // menu | how | hangar | archive | playing | paused | modules | over | win
+  mode: "menu",           // menu | how | hangar | archive | settings | playing | paused | modules | over | win
   t: 0,                   // global seconds (always advances, for menu FX)
   run: null,
   flash: 0,               // white flash 0..1
@@ -4120,7 +4185,7 @@ function chooseModule(idx) {
 function showBanner(run, title, sub, color, dur, small) {
   G.banner = { title, sub: sub || "", color: color || "#9fe8ff", t: 0, dur: dur || 2.0, small: !!small };
 }
-const SCREENS = ["screen-menu", "screen-how", "screen-pause", "screen-modules", "screen-over", "screen-win", "screen-hangar", "screen-archive"];
+const SCREENS = ["screen-menu", "screen-how", "screen-pause", "screen-modules", "screen-over", "screen-win", "screen-hangar", "screen-options", "screen-archive"];
 let hangarTab = "arsenal";
 function openHangar() {
   if (!["menu", "hangar", "over", "win"].includes(G.mode)) return;
@@ -4248,6 +4313,12 @@ function renderHangar() {
       });
       card.append(h, d, b); grid.appendChild(card);
     }
+    const settingsCard = document.createElement("div"); settingsCard.className = "hangar-card achievement-card unlocked";
+    const settingsTitle = document.createElement("div"); settingsTitle.className = "hname"; settingsTitle.textContent = "Full configuration";
+    const settingsCopy = document.createElement("p"); settingsCopy.className = "hdesc"; settingsCopy.textContent = "Adjust mouse sensitivity, master volume, HUD scale, fullscreen, and visual comfort.";
+    const settingsButton = document.createElement("button"); settingsButton.className = "btn primary"; settingsButton.textContent = "OPEN SYSTEM SETTINGS";
+    settingsButton.addEventListener("click", openSettings);
+    settingsCard.append(settingsTitle, settingsCopy, settingsButton); grid.appendChild(settingsCard);
     document.getElementById("hangar-note").textContent = "Accessibility and audio preferences are saved locally on this device.";
   }
   wrap.appendChild(grid);
@@ -4255,6 +4326,188 @@ function renderHangar() {
 document.querySelectorAll("[data-hangar-tab]").forEach(b => b.addEventListener("click", () => {
   hangarTab = b.getAttribute("data-hangar-tab"); renderHangar(); Sound.ui();
 }));
+
+const SYSTEM_SETTINGS_DEFAULTS = Object.freeze({
+  damageNumbers: true, screenShake: 1, music: true, masterVolume: 0.85, soundEnabled: true,
+  mouseSensitivity: 1, hudScale: 1, reducedFlashes: false
+});
+let optionsReturnMode = "menu";
+let optionsReturnFocus = null;
+const OPTIONS_RETURN_SCREENS = {
+  menu: "screen-menu", hangar: "screen-hangar", paused: "screen-pause",
+  over: "screen-over", win: "screen-win"
+};
+
+function makeOptionCard(grid, title, help) {
+  const card = document.createElement("section"); card.className = "option-card";
+  const heading = document.createElement("strong"); heading.className = "option-title"; heading.textContent = title;
+  const copy = document.createElement("p"); copy.className = "option-help"; copy.textContent = help;
+  card.append(heading, copy); grid.appendChild(card);
+  return card;
+}
+function addRangeOption(grid, cfg) {
+  const card = makeOptionCard(grid, cfg.title, cfg.help);
+  const row = document.createElement("div"); row.className = "option-control";
+  const input = document.createElement("input");
+  input.type = "range"; input.className = "option-range"; input.id = cfg.id;
+  input.min = String(cfg.min); input.max = String(cfg.max); input.step = String(cfg.step);
+  input.value = String(cfg.get()); input.setAttribute("aria-label", cfg.title);
+  const output = document.createElement("output"); output.className = "option-value"; output.htmlFor = cfg.id;
+  const format = value => cfg.format(value);
+  output.textContent = format(Number(input.value));
+  const apply = () => {
+    const value = clamp(Number(input.value), cfg.min, cfg.max);
+    cfg.set(value); output.textContent = format(value);
+  };
+  input.addEventListener("input", apply);
+  input.addEventListener("change", () => { apply(); Profile.save(); });
+  row.append(input, output); card.appendChild(row);
+  return input;
+}
+function addToggleOption(grid, cfg) {
+  const card = makeOptionCard(grid, cfg.title, cfg.help);
+  const button = document.createElement("button");
+  button.type = "button"; button.className = "option-toggle"; button.id = cfg.id;
+  const paint = () => {
+    const state = cfg.read();
+    button.textContent = state;
+    button.setAttribute("aria-label", cfg.title + " setting: " + state);
+    button.setAttribute("aria-pressed", state !== "OFF" ? "true" : "false");
+  };
+  button.addEventListener("click", () => {
+    cfg.activate(); Profile.save(); paint();
+    const status = document.getElementById("options-status");
+    if (status) status.textContent = cfg.title + " · " + cfg.read();
+  });
+  paint(); card.appendChild(button);
+  return button;
+}
+function fullscreenActive() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+function syncFullscreenControl() {
+  const button = document.getElementById("btn-options-fullscreen");
+  if (!button) return;
+  const active = fullscreenActive();
+  const request = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+  const exit = document.exitFullscreen || document.webkitExitFullscreen;
+  const supported = active ? !!exit : !!request;
+  button.textContent = !supported ? "Fullscreen unavailable" : active ? "Exit fullscreen" : "Enter fullscreen";
+  button.setAttribute("aria-label", active ? "Exit fullscreen" : supported ? "Enter fullscreen" : "Fullscreen unavailable");
+  button.setAttribute("aria-pressed", active ? "true" : "false");
+  button.disabled = !supported;
+}
+function syncMuteButton() {
+  const button = document.getElementById("btn-mute");
+  if (button) button.innerHTML = "Audio: " + (Sound.enabled ? "On" : "Off") + ' <span class="k">M</span>';
+}
+function fullscreenFailure() {
+  const status = document.getElementById("options-status");
+  if (status) status.textContent = "Fullscreen is unavailable or was denied by the browser.";
+  syncFullscreenControl();
+}
+function toggleFullscreen() {
+  const active = fullscreenActive();
+  const exit = document.exitFullscreen || document.webkitExitFullscreen;
+  const request = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+  if (active && !exit || !active && !request) { fullscreenFailure(); return false; }
+  try {
+    const pending = active ? exit.call(document) : request.call(document.documentElement);
+    if (pending && typeof pending.catch === "function") pending.catch(fullscreenFailure);
+    return true;
+  } catch (_) { fullscreenFailure(); return false; }
+}
+function renderSettings() {
+  const grid = document.getElementById("options-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  addRangeOption(grid, {
+    id: "option-volume", title: "Master volume", help: "Controls every synthesized effect and the ambient score.",
+    min: 0, max: 1, step: 0.01, get: () => Profile.prefs.masterVolume,
+    set: value => { Profile.prefs.masterVolume = value; Sound.setVolume(value); },
+    format: value => Math.round(value * 100) + "%"
+  });
+  addRangeOption(grid, {
+    id: "option-sensitivity", title: "Mouse sensitivity", help: "Pointer-lock aim response. Lower values make fine tracking easier.",
+    min: 0.25, max: 2.5, step: 0.05, get: () => Profile.prefs.mouseSensitivity,
+    set: value => { Profile.prefs.mouseSensitivity = value; Input.mouseSensitivity = value; },
+    format: value => value.toFixed(2) + "×"
+  });
+  addRangeOption(grid, {
+    id: "option-hud-scale", title: "HUD scale", help: "Resize combat readouts without changing the game view.",
+    min: 0.8, max: 1.25, step: 0.05, get: () => Profile.prefs.hudScale,
+    set: value => { Profile.prefs.hudScale = value; },
+    format: value => Math.round(value * 100) + "%"
+  });
+  addToggleOption(grid, {
+    id: "option-sound", title: "Master audio", help: "Mute or restore all game audio. The M shortcut toggles this setting.",
+    read: () => Sound.enabled ? "ON" : "OFF",
+    activate: () => { Profile.prefs.soundEnabled = Sound.toggle(); }
+  });
+  addToggleOption(grid, {
+    id: "option-music", title: "Ambient score", help: "Toggle the procedural station drone; combat sounds remain available.",
+    read: () => Profile.prefs.music ? "ON" : "OFF",
+    activate: () => { Profile.prefs.music = !Profile.prefs.music; Sound.setMusic(Profile.prefs.music); }
+  });
+  addToggleOption(grid, {
+    id: "option-damage-numbers", title: "Damage numbers", help: "Show floating damage values when hostiles are hit.",
+    read: () => Profile.prefs.damageNumbers ? "ON" : "OFF",
+    activate: () => { Profile.prefs.damageNumbers = !Profile.prefs.damageNumbers; }
+  });
+  addToggleOption(grid, {
+    id: "option-screen-shake", title: "Screen shake", help: "Cycle between full, reduced, and disabled camera shake.",
+    read: () => Profile.prefs.screenShake === 0 ? "OFF" : Profile.prefs.screenShake < 1 ? "REDUCED" : "FULL",
+    activate: () => { Profile.prefs.screenShake = Profile.prefs.screenShake === 1 ? 0.45 : Profile.prefs.screenShake === 0.45 ? 0 : 1; }
+  });
+  addToggleOption(grid, {
+    id: "option-reduced-flashes", title: "Reduced flashes", help: "Diminish white transition, damage, and low-integrity screen flashes.",
+    read: () => Profile.prefs.reducedFlashes ? "ON" : "OFF",
+    activate: () => { Profile.prefs.reducedFlashes = !Profile.prefs.reducedFlashes; }
+  });
+  const display = makeOptionCard(grid, "Display mode", "Use the full browser display when supported. Escape follows your browser's fullscreen behavior.");
+  const full = document.createElement("button"); full.type = "button"; full.className = "option-toggle"; full.id = "btn-options-fullscreen";
+  full.addEventListener("click", toggleFullscreen); display.appendChild(full); syncFullscreenControl();
+}
+function openSettings() {
+  if (!Object.prototype.hasOwnProperty.call(OPTIONS_RETURN_SCREENS, G.mode)) return false;
+  optionsReturnMode = G.mode;
+  optionsReturnFocus = document.activeElement;
+  G.mode = "settings";
+  showScreen("screen-options");
+  renderSettings();
+  const firstControl = document.querySelector("#options-grid input, #options-grid button");
+  if (firstControl) firstControl.focus({ preventScroll: true });
+  Sound.uiBig();
+  return true;
+}
+function closeSettings() {
+  if (G.mode !== "settings") return false;
+  G.mode = OPTIONS_RETURN_SCREENS[optionsReturnMode] ? optionsReturnMode : "menu";
+  showScreen(OPTIONS_RETURN_SCREENS[G.mode] || "screen-menu");
+  if (G.mode === "hangar") renderHangar();
+  const focusIsVisible = optionsReturnFocus && document.documentElement.contains(optionsReturnFocus) &&
+    typeof optionsReturnFocus.closest === "function" && !optionsReturnFocus.closest(".hidden") && optionsReturnFocus !== document.body;
+  const fallbackFocus = {
+    menu: "btn-start", hangar: "btn-hangar-back", paused: "btn-resume", over: "btn-retry", win: "btn-again"
+  }[G.mode];
+  const returnTarget = focusIsVisible ? optionsReturnFocus : fallbackFocus && document.getElementById(fallbackFocus);
+  if (returnTarget && typeof returnTarget.focus === "function") returnTarget.focus({ preventScroll: true });
+  optionsReturnFocus = null;
+  Sound.ui();
+  return true;
+}
+function restoreSystemSettings() {
+  Object.assign(Profile.prefs, SYSTEM_SETTINGS_DEFAULTS);
+  Input.mouseSensitivity = Profile.prefs.mouseSensitivity;
+  Sound.setVolume(Profile.prefs.masterVolume);
+  Sound.setMusic(Profile.prefs.music);
+  Sound.setEnabled(Profile.prefs.soundEnabled);
+  Profile.save(); renderSettings();
+  const status = document.getElementById("options-status");
+  if (status) status.textContent = "System settings restored to defaults.";
+}
+document.addEventListener("fullscreenchange", syncFullscreenControl);
+document.addEventListener("webkitfullscreenchange", syncFullscreenControl);
 
 let archiveSelectedSector = 1;
 let archiveReturnMode = "menu";
@@ -4676,6 +4929,7 @@ function togglePause(force) {
     document.getElementById("p-mult").textContent = "×" + Math.max(1, run.combo);
     document.getElementById("p-kills").textContent = fmt(run.kills);
     document.getElementById("p-hp").textContent = Math.round(p.hp) + " / " + p.maxHp;
+    syncMuteButton();
     showScreen("screen-pause");
     Sound.setDrone(0.04);
   } else if (G.mode === "paused" && force !== true) {
@@ -4695,7 +4949,8 @@ Game.onKey = function (code, e) {
   Sound.init(); Sound.resume();
   if (code === "KeyM") {
     const on = Sound.toggle();
-    document.getElementById("btn-mute").innerHTML = "Audio: " + (on ? "On" : "Off") + ' <span class="k">M</span>';
+    Profile.prefs.soundEnabled = on; Profile.save();
+    syncMuteButton();
     return;
   }
   switch (G.mode) {
@@ -4703,6 +4958,7 @@ Game.onKey = function (code, e) {
       if (code === "Enter" || code === "Space" || code === "NumpadEnter") startRun();
       else if (code === "KeyN" && Profile.ngPlusTier > 0) startNewGamePlus();
       else if (code === "KeyA") openArchive();
+      else if (code === "KeyO") openSettings();
       else if (code === "KeyH" || code === "Slash") { G.mode = "how"; showScreen("screen-how"); Sound.ui(); }
       break;
     case "how":
@@ -4719,6 +4975,10 @@ Game.onKey = function (code, e) {
       break;
     case "paused":
       if (code === "Escape" || code === "KeyP" || code === "Enter") togglePause(false);
+      else if (code === "KeyO") openSettings();
+      break;
+    case "settings":
+      if (code === "Escape" || code === "KeyB") closeSettings();
       break;
     case "modules":
       if (code === "Digit1") chooseModule(0);
@@ -4742,11 +5002,16 @@ document.getElementById("btn-archive").addEventListener("click", openArchive);
 document.getElementById("btn-hangar").addEventListener("click", openHangar);
 document.getElementById("btn-hangar-back").addEventListener("click", () => { toMenu(); Sound.ui(); });
 document.getElementById("btn-how").addEventListener("click", () => { G.mode = "how"; showScreen("screen-how"); Sound.init(); Sound.resume(); Sound.ui(); });
+document.getElementById("btn-options").addEventListener("click", openSettings);
+document.getElementById("btn-pause-options").addEventListener("click", openSettings);
+document.getElementById("btn-options-back").addEventListener("click", closeSettings);
+document.getElementById("btn-options-reset").addEventListener("click", restoreSystemSettings);
 document.getElementById("btn-how-back").addEventListener("click", () => { G.mode = "menu"; showScreen("screen-menu"); Sound.ui(); });
 document.getElementById("btn-resume").addEventListener("click", () => togglePause(false));
-document.getElementById("btn-mute").addEventListener("click", e => {
+document.getElementById("btn-mute").addEventListener("click", () => {
   const on = Sound.toggle();
-  e.currentTarget.innerHTML = "Audio: " + (on ? "On" : "Off") + ' <span class="k">M</span>';
+  Profile.prefs.soundEnabled = on; Profile.save();
+  syncMuteButton();
 });
 document.getElementById("btn-abort").addEventListener("click", () => { if (G.run && G.mode === "paused") submitRun(G.run); toMenu(); });
 document.getElementById("btn-retry").addEventListener("click", () => startRun());
@@ -4927,6 +5192,7 @@ function render() {
   ctx.restore();
 
   drawPostFX(run);
+  if (Input.pointerLocked) drawAimReticle(run);
   drawHUD(run);
 }
 
@@ -5721,10 +5987,11 @@ function drawGlowPass(run) {
  * ------------------------------------------------------------------ */
 function drawPostFX(run) {
   const p = run.player;
+  const flashComfort = Profile.prefs.reducedFlashes ? 0.22 : 1;
 
-  // white flash (sector transitions)
+  // white flash (sector transitions), scaled down for photosensitivity comfort
   if (G.flash > 0.001) {
-    ctx.fillStyle = "rgba(220,245,255," + (G.flash * 0.8).toFixed(3) + ")";
+    ctx.fillStyle = "rgba(220,245,255," + (G.flash * 0.8 * flashComfort).toFixed(3) + ")";
     ctx.fillRect(0, 0, VW, VH);
   }
 
@@ -5744,7 +6011,7 @@ function drawPostFX(run) {
     ctx.rotate(run.hurtDir || 0);
     const g = ctx.createLinearGradient(0, 0, 190, 0);
     g.addColorStop(0, "rgba(255,70,50,0)");
-    g.addColorStop(1, "rgba(255,70,50," + (0.55 * k).toFixed(3) + ")");
+    g.addColorStop(1, "rgba(255,70,50," + (0.55 * k * flashComfort).toFixed(3) + ")");
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.moveTo(0, -70); ctx.lineTo(200, -130); ctx.lineTo(200, 130); ctx.lineTo(0, 70);
@@ -5755,14 +6022,43 @@ function drawPostFX(run) {
     const pulse = 0.16 + 0.14 * Math.sin(G.t * 5.2);
     const g = ctx.createRadialGradient(VW / 2, VH / 2, Math.min(VW, VH) * 0.2, VW / 2, VH / 2, Math.max(VW, VH) * 0.7);
     g.addColorStop(0, "rgba(255,40,30,0)");
-    g.addColorStop(1, "rgba(255,40,30," + (pulse * (1 - hpFrac / 0.42)).toFixed(3) + ")");
+    g.addColorStop(1, "rgba(255,40,30," + (pulse * (1 - hpFrac / 0.42) * flashComfort).toFixed(3) + ")");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, VW, VH);
   }
   if (p.hurtFlash > 0) {
-    ctx.fillStyle = "rgba(255,60,40," + (p.hurtFlash * 0.2).toFixed(3) + ")";
+    ctx.fillStyle = "rgba(255,60,40," + (p.hurtFlash * 0.2 * flashComfort).toFixed(3) + ")";
     ctx.fillRect(0, 0, VW, VH);
   }
+}
+
+function drawAimReticle(run) {
+  if (!Input.pointerLocked || !run || !run.player) return;
+  const p = run.player, cam = run.cam;
+  const margin = 16;
+  const rawX = VW / 2 + p.x + Input.lockAimX - cam.x + (cam.shakeX || 0);
+  const rawY = VH / 2 + p.y + Input.lockAimY - cam.y + (cam.shakeY || 0);
+  const x = clamp(rawX, margin, VW - margin), y = clamp(rawY, margin, VH - margin);
+  const S = clamp(Math.min(VW / 1280, VH / 720), 0.72, 1.35);
+  const radius = 6.5 * S, gap = 4.2 * S, arm = 12 * S;
+  const palette = VISUAL_THEMES[Profile.selectedTheme] || VISUAL_THEMES.ice;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.strokeStyle = palette.highlight;
+  ctx.fillStyle = palette.accent;
+  ctx.lineWidth = 1.5 * S;
+  ctx.globalAlpha = 0.88;
+  ctx.shadowColor = palette.accent;
+  ctx.shadowBlur = 9 * S;
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, TAU);
+  ctx.moveTo(-arm, 0); ctx.lineTo(-gap, 0);
+  ctx.moveTo(arm, 0); ctx.lineTo(gap, 0);
+  ctx.moveTo(0, -arm); ctx.lineTo(0, -gap);
+  ctx.moveTo(0, arm); ctx.lineTo(0, gap);
+  ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, 0, 1.5 * S, 0, TAU); ctx.fill();
+  ctx.restore();
 }
 
 /* ------------------------------------------------------------------ *
@@ -5771,7 +6067,8 @@ function drawPostFX(run) {
 function drawHUD(run) {
   const p = run.player;
   const palette = VISUAL_THEMES[Profile.selectedTheme] || VISUAL_THEMES.ice;
-  const S = clamp(Math.min(VW / 1280, VH / 720), 0.72, 1.35);
+  const baseScale = clamp(Math.min(VW / 1280, VH / 720), 0.72, 1.35);
+  const S = clamp(baseScale * clamp(Number(Profile.prefs.hudScale) || 1, 0.8, 1.25), 0.58, 1.7);
   ctx.save();
   ctx.textBaseline = "alphabetic";
 
@@ -6298,7 +6595,11 @@ function boot() {
   applyVisualTheme(Profile.selectedTheme, false);
   resize();
   refreshRecords();
+  Input.mouseSensitivity = Profile.prefs.mouseSensitivity;
+  Sound.setVolume(Profile.prefs.masterVolume);
   Sound.setMusic(Profile.prefs.music);
+  Sound.setEnabled(Profile.prefs.soundEnabled);
+  syncMuteButton();
   if (isTouchDevice()) {
     document.getElementById("touch-hint").textContent =
       "Touch controls enabled — left stick moves, right stick aims and fires";
@@ -6319,7 +6620,7 @@ window.__BP = {
   get moduleChoices() { return moduleChoices.slice(); },
   api: {
     startRun, startNewGamePlus, startArchiveRun, openArchive, renderArchive, closeArchive,
-    update, render, generateSector, startWave, spawnEnemy, spawnBoss,
+    update, render, drawAimReticle, generateSector, startWave, spawnEnemy, spawnBoss,
     chooseModule, buildModuleChoices, openHangar, renderHangar, applyArsenal, applyVisualTheme,
     updateBoss, updateHazards, updateAltFire, updateAchievements, updatePickups, teslaChain,
     collect, damageEnemy, fireHostile, advanceSector, resolveEnding, recordChoice, submitRun,

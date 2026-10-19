@@ -30,7 +30,8 @@ A self-contained, top-down twin-stick survival shooter. Descend through HADAL-9,
 - **Three alternate weapon modes:** Pulse SMG overcharge beam, Breach-12 proximity mines, and Arc Lance Aegis.
 - **Five biomes and four hazards:** Maintenance Spine, Hydroponic Bloom, Coolant Ring, Specimen Vault, and The Nest; steam, spore, Tesla, and crusher hazards; nine sector protocols; seven elite affixes.
 - **Sector-10 finale:** the three-phase Warden of the Core telegraphs volleys, charges, summons, and a spiral barrage. Its defeat is required for a career victory.
-- Desktop runs capture the pointer for relative-mouse aiming; Escape pauses and releases it, and resuming attempts to recapture. Unsupported browsers and touch devices retain ordinary mouse/touch controls.
+- Desktop runs capture the pointer for relative-mouse aiming with a visible, palette-aware reticle; Escape pauses and releases it, and resuming attempts to recapture. Unsupported browsers and touch devices retain ordinary mouse/touch controls.
+- A dedicated **System Settings** screen is available from the title and pause menus: live master-volume, mouse-sensitivity and HUD-scale sliders; persistent master mute, music, damage-number, reduced-flash and screen-shake controls; and browser fullscreen support. Preferences persist locally.
 - Damage numbers, kill-streak callouts, lightning chains, temporary Overdrive/Aegis pickups, boss phase effects, synthesized audio, touch controls, pause, records, and performance safeguards remain part of the single-file game.
 
 ---
@@ -40,7 +41,7 @@ A self-contained, top-down twin-stick survival shooter. Descend through HADAL-9,
 | Input | Action |
 | --- | --- |
 | `W A S D` / arrows | Move |
-| Mouse | Aim; on desktop, the pointer captures to the game at run start and relative movement aims |
+| Mouse | Aim; desktop runs capture the pointer and use relative movement. Adjust sensitivity in System Settings. |
 | Left mouse / `Space` | Primary fire — hold for auto weapons, click for the Arc Lance |
 | Right mouse / `G` | Hold for the current weapon's alternate fire |
 | `Shift` | Dash with invulnerability frames |
@@ -53,6 +54,7 @@ A self-contained, top-down twin-stick survival shooter. Descend through HADAL-9,
 | `A` (title screen) | Open Sector Archive |
 | `N` (after unlock) | Start the latest New Game+ tier |
 | `M` | Toggle audio |
+| `O` | Open System Settings from the title or pause screen |
 | `Enter` | Start or redeploy a standard run |
 | Touch | Left stick moves; right stick aims/fires; Flare, Dash, and Alt buttons are provided |
 
@@ -80,15 +82,15 @@ npm run balance
 npm run qa
 ```
 
-The automated suite has **32 passing test groups**. The jsdom Canvas mock records draw calls and checks non-finite geometry and gradients; a Web Audio stub validates scheduled parameters. Tests cover the complete campaign loop, persistence and veteran-profile migration, refresh-rate regressions, biomes and hazards, all three alternate fires, the Warden, career victory, branch choice/history/endings, the five-ending reward, New Game+ scaling, cosmetic persistence, non-ranked archive replays, and the desktop pointer-lock lifecycle with relative mouse aiming.
+The automated suite has **33 passing test groups**. The jsdom Canvas mock records draw calls and checks non-finite geometry and gradients; a Web Audio stub validates scheduled parameters. Tests cover the complete campaign loop, persistence and veteran-profile migration, refresh-rate regressions, biomes and hazards, all three alternate fires, the Warden, career victory, branch choice/history/endings, the five-ending reward, New Game+ scaling, cosmetic persistence, non-ranked archive replays, desktop pointer-lock aiming, and the persistent settings screen.
 
-`qa/balance-bot.js` is a stress/pacing probe using weapon selection, ballistic leading, route planning, dodges, pickup priorities, and energy modes. It is not a victory guarantee. Latest sample: 3 trials, 0 victories, average sector 3.0, deepest sector 5, and no runtime errors.
+`qa/balance-bot.js` is a stress/pacing probe using weapon selection, ballistic leading, route planning, dodges, pickup priorities, and energy modes. It is not a victory guarantee. Latest sample: 3 trials, 0 victories, average sector 4.3, deepest sector 6, and no runtime errors.
 
 ## Files
 
 ```text
 index.html          Complete playable game: HTML, CSS, procedural art, Web Audio, and all game systems
-qa/harness.js       32-group headless QA suite
+qa/harness.js       33-group headless QA suite
 qa/balance-bot.js   Autonomous gameplay/pacing probe
 qa/package.json     jsdom dependency for QA only
 README.md           This guide and changelog

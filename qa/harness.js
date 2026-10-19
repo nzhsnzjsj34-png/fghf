@@ -183,6 +183,22 @@ function boot(opts) {
           return Promise.resolve();
         };
       }
+      if (opts.fullscreen) {
+        let fullscreenElement = null;
+        Object.defineProperty(window.document, "fullscreenElement", {
+          configurable: true, get: () => fullscreenElement
+        });
+        window.Element.prototype.requestFullscreen = function () {
+          fullscreenElement = this;
+          window.document.dispatchEvent(new window.Event("fullscreenchange"));
+          return Promise.resolve();
+        };
+        window.document.exitFullscreen = function () {
+          fullscreenElement = null;
+          window.document.dispatchEvent(new window.Event("fullscreenchange"));
+          return Promise.resolve();
+        };
+      }
       if (opts.storage && typeof opts.storage === "object") {
         for (const [key, value] of Object.entries(opts.storage)) window.localStorage.setItem(key, String(value));
       }
@@ -1127,6 +1143,9 @@ if (require.main === module) {
     canvas.dispatchEvent(movement);
     assert(BP.Input.lockAimX === beforeX + 36 && BP.Input.lockAimY === beforeY - 18,
       "relative mouse deltas did not move the virtual aim target");
+    const drawCalls = canvas.__ctx.__calls.count;
+    BP.api.drawAimReticle(run);
+    assert(canvas.__ctx.__calls.count > drawCalls, "locked mouse aim reticle was not rendered");
     run.player.invuln = 999;
     BP.api.advanceSector(run);
     assert(BP.G.mode === "modules" && w.document.pointerLockElement === null,
@@ -1145,6 +1164,83 @@ if (require.main === module) {
     assert(w.document.pointerLockElement === null && !BP.Input.pointerLocked, "game over did not release the pointer lock");
     assert(x.errors.length === 0, "pointer lock lifecycle errors:\n" + x.errors.join("\n"));
     w.close();
+  });
+
+  /* ---- T33: persistent, accessible system options and pause return path ---- */
+  check("OPTIONS: volume, sensitivity, HUD, accessibility and pause settings persist", () => {
+    const x = boot({ w: 1280, h: 720, fullscreen: true }), w = x.window, BP = w.__BP;
+    const menuOptions = w.document.getElementById("btn-options");
+    menuOptions.focus();
+    menuOptions.dispatchEvent(new w.KeyboardEvent("keydown", { code: "Enter", key: "Enter", bubbles: true, cancelable: true }));
+    assert(BP.G.mode === "menu", "keyboard focus on Options accidentally launched a run");
+    menuOptions.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    assert(BP.G.mode === "settings", "main menu did not open system settings");
+    assert(!w.document.getElementById("screen-options").classList.contains("hidden"), "settings screen is hidden");
+    function setRange(id, value) {
+      const input = w.document.getElementById(id);
+      assert(input && input.type === "range", "missing range control: " + id);
+      input.value = String(value);
+      input.dispatchEvent(new w.Event("input", { bubbles: true }));
+      input.dispatchEvent(new w.Event("change", { bubbles: true }));
+    }
+    function click(id) {
+      const button = w.document.getElementById(id);
+      assert(button, "missing setting control: " + id);
+      button.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    }
+    setRange("option-volume", 0.37);
+    setRange("option-sensitivity", 1.55);
+    setRange("option-hud-scale", 1.15);
+    click("option-music");
+    click("option-damage-numbers");
+    click("option-reduced-flashes");
+    click("option-screen-shake");
+    click("option-sound");
+    assert(Math.abs(BP.Sound.volume - 0.37) < 0.001, "master volume did not apply immediately");
+    assert(!BP.Sound.enabled && !BP.Profile.prefs.soundEnabled, "master audio toggle did not mute and save");
+    assert(Math.abs(BP.Input.mouseSensitivity - 1.55) < 0.001, "mouse sensitivity did not apply immediately");
+    assert(Math.abs(BP.Profile.prefs.hudScale - 1.15) < 0.001, "HUD scale did not persist");
+    assert(!BP.Profile.prefs.music && !BP.Profile.prefs.damageNumbers && BP.Profile.prefs.reducedFlashes && !BP.Profile.prefs.soundEnabled,
+      "toggle options did not update their profile preferences");
+    assert(BP.Profile.prefs.screenShake === 0.45, "screen shake did not cycle to reduced");
+    const fullscreenButton = w.document.getElementById("btn-options-fullscreen");
+    assert(!fullscreenButton.disabled, "supported fullscreen control was disabled");
+    click("btn-options-fullscreen");
+    assert(w.document.fullscreenElement === w.document.documentElement && fullscreenButton.getAttribute("aria-pressed") === "true",
+      "fullscreen request did not update its state");
+    click("btn-options-fullscreen");
+    assert(w.document.fullscreenElement === null && fullscreenButton.getAttribute("aria-pressed") === "false",
+      "fullscreen exit did not update its state");
+    const savedProfile = w.localStorage.getItem("blackout-protocol-profile-v2");
+    const y = boot({ w: 1280, h: 720, storage: { "blackout-protocol-profile-v2": savedProfile } });
+    assert(Math.abs(y.window.__BP.Profile.prefs.masterVolume - 0.37) < 0.001, "master volume did not survive reload");
+    assert(Math.abs(y.window.__BP.Profile.prefs.mouseSensitivity - 1.55) < 0.001, "sensitivity did not survive reload");
+    assert(y.window.__BP.Profile.prefs.reducedFlashes && y.window.__BP.Profile.prefs.hudScale === 1.15,
+      "accessibility/display preferences did not survive reload");
+    assert(!y.window.__BP.Profile.prefs.soundEnabled && !y.window.__BP.Sound.enabled,
+      "muted master-audio preference did not survive reload");
+    press(w, "KeyM");
+    assert(BP.Sound.enabled && BP.Profile.prefs.soundEnabled, "M did not unmute and save the audio preference");
+    release(w, "KeyM");
+    press(w, "KeyM");
+    assert(!BP.Sound.enabled && !BP.Profile.prefs.soundEnabled, "M did not mute and save the audio preference");
+    release(w, "KeyM");
+    click("btn-options-reset");
+    assert(BP.Profile.prefs.masterVolume === 0.85 && BP.Input.mouseSensitivity === 1 && BP.Profile.prefs.music,
+      "restore defaults did not reset system settings");
+    click("btn-options-back");
+    assert(BP.G.mode === "menu", "settings back button did not return to the menu");
+    const run = BP.api.startRun(); pump(w, 5, 16.7);
+    BP.api.togglePause(true);
+    const runTime = run.time;
+    click("btn-pause-options");
+    assert(BP.G.mode === "settings", "pause menu did not open settings");
+    click("btn-options-back");
+    assert(BP.G.mode === "paused", "settings did not return to the paused run");
+    pump(w, 20, 16.7);
+    assert(run.time === runTime, "simulation advanced while settings was opened from pause");
+    assert(x.errors.length === 0 && y.errors.length === 0, "settings errors:\n" + x.errors.concat(y.errors).join("\n"));
+    w.close(); y.window.close();
   });
 
   console.log(results.join("\n"));
