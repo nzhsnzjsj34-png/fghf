@@ -285,6 +285,54 @@ if (require.main === module) {
     }
   });
 
+  /* ---- New gameplay feature: optional contract progress and lift-bank rewards. ---- */
+  check("sector contracts rotate deterministically, track goals and bank rewards at the lift", () => {
+    const w = env.window, BP = w.__BP;
+    const seedState = { seed: 0x12345678, sector: 6, time: 12, lastContractId: null, contractsIssued: 0 };
+    const first = BP.api.createSectorContract(seedState);
+    const again = BP.api.createSectorContract({ seed: 0x12345678, sector: 6, time: 12, lastContractId: null, contractsIssued: 0 });
+    assert(first.id === again.id, "same seed did not produce the same sector contract");
+    const next = BP.api.createSectorContract(seedState);
+    assert(next.id !== first.id, "contract repeated on consecutive sectors");
+
+    const run = BP.api.startRun(); pump(w, 3);
+    assert(run.contract && run.contract.short, "new sector did not receive a contract");
+    run.contract = { id: "qa-dark", short: "DARK OPS", type: "dark", goal: 2, reward: 80,
+      progress: 0, complete: false, failed: false, settled: false, startTime: run.time };
+    run.player.lampOn = false;
+    for (let i = 0; i < 2; i++) {
+      const enemy = BP.api.spawnEnemy(run, "lurker", run.player.x + 280 + i * 45, run.player.y, { spawnT: 0 });
+      BP.api.killEnemy(run, enemy, {});
+    }
+    assert(run.contract.complete && run.contract.progress === 2, "lamp-off kills did not complete the objective");
+    const beforeBank = run.salvage;
+    assert(beforeBank > 0, "enemy kills did not award baseline salvage");
+    const notice = BP.api.settleSectorContract(run);
+    assert(notice.includes("CONTRACT CLEARED") && run.salvage > beforeBank, "completed contract was not banked at the lift");
+    assert(run.contractsCompleted === 1, "completed contract was not counted");
+
+    run.contract = { id: "qa-clean", short: "CLEAN SEAL", type: "clean", goal: 1, reward: 90,
+      progress: 0, complete: false, failed: false, settled: false, startTime: run.time };
+    run.player.hp = run.player.maxHp; run.player.invuln = 0;
+    BP.api.hurtPlayer(run, 4, 0, "test hit");
+    assert(run.contract.failed, "a hit did not fail the clean-sector contract");
+    const afterCleanHit = run.salvage;
+    BP.api.settleSectorContract(run);
+    assert(run.salvage === afterCleanHit, "failed clean contract paid a reward");
+
+    run.contract = { id: "qa-timer", short: "RAPID PURGE", type: "kills", goal: 14, deadline: 10,
+      progress: 0, complete: false, failed: false, settled: false, startTime: run.time - 11 };
+    BP.api.updateContractDeadline(run);
+    assert(run.contract.failed, "expired timed contract remained active");
+
+    run.sector = 6; run.wave = 3;
+    run.contract = { id: "rift", short: "RIFT HUNT", type: "target", targetKind: "rift", goal: 1,
+      reward: 100, progress: 0, complete: false, failed: false, settled: false, targetQueued: false, startTime: run.time };
+    BP.api.startWave(run);
+    assert(run.contract.targetQueued && run.spawners.some(s => s.contractTarget === "rift" && s.kind === "rift"),
+      "Rift Hunt contract did not summon its marked Stalker");
+  });
+
   /* ---- T2: start a run, verify sector generation ---- */
   check("startRun generates a valid sector", () => {
     const w = env.window, BP = w.__BP;
@@ -431,7 +479,7 @@ if (require.main === module) {
     assert(run.rank && typeof run.rank === "string", "rank missing");
     pump(w, 5, 16.7);
     assert(!w.document.getElementById("screen-over").classList.contains("hidden"), "game-over screen never shown");
-    assert(w.document.getElementById("over-stats").children.length === 11, "stat block incomplete");
+    assert(w.document.getElementById("over-stats").children.length === 12, "stat block incomplete");
     assert(BP.Records.runs >= 1, "run was not recorded");
     assert(env.errors.length === 0, "errors during death flow:\n" + env.errors.join("\n"));
   });
@@ -526,11 +574,11 @@ if (require.main === module) {
   });
 
   /* ---- T10: every enemy type behaves ---- */
-  check("all four standard enemy archetypes update, attack and die", () => {
+  check("all five standard enemy archetypes update, attack and die", () => {
     const w = env.window, BP = w.__BP;
     BP.api.startRun(); pump(w, 60, 16.7);
     const run = BP.G.run;
-    for (const kind of ["lurker", "skitter", "screamer", "brood"]) {
+    for (const kind of ["lurker", "skitter", "screamer", "brood", "rift"]) {
       const e = BP.api.spawnEnemy(run, kind, run.player.x + 90, run.player.y + 40, {});
       e.spawnT = 0;
       pump(w, 240, 16.7);
@@ -548,6 +596,31 @@ if (require.main === module) {
     const hp0 = run.player.hp;
     pump(w, 120, 16.7);
     assert(run.player.hp <= hp0, "screamer ring never hurt the player");
+  });
+
+  /* ---- Rift Stalker telegraph/counterplay regression. ---- */
+  check("Rift Stalker is cloaked in darkness, telegraphs a pounce and recoils from the lamp", () => {
+    const w = env.window, BP = w.__BP;
+    BP.api.startRun(); pump(w, 3);
+    const run = BP.G.run, p = run.player;
+    run.enemies.length = 0; run.spawners.length = 0;
+    p.hp = p.maxHp; p.invuln = 999; p.lampOn = false; p.angle = 0;
+    const stalker = BP.api.spawnEnemy(run, "rift", p.x + 260, p.y, { spawnT: 0 });
+    stalker.spawnT = 0; stalker.state = "wind"; stalker.stateT = 0.01; stalker.aggro = 0;
+    assert(stalker.cloaked, "Rift Stalker is not cloaked");
+    pump(w, 5, 16.7);
+    assert(stalker.state === "pounce", "dark telegraph did not transition into a pounce (state=" + stalker.state + ")");
+    assert(Math.hypot(stalker.vx, stalker.vy) > 500, "pounce did not launch at speed");
+
+    run.enemies.length = 0;
+    p.angle = 0; p.lampOn = true; p.lampRange = 330;
+    const repelled = BP.api.spawnEnemy(run, "rift", p.x + 240, p.y, { spawnT: 0 });
+    repelled.spawnT = 0; repelled.state = "wind"; repelled.stateT = 0.5; repelled.aggro = 0;
+    const repelStartX = repelled.x;
+    pump(w, 2, 16.7);
+    assert(repelled.state === "recover", "lamp failed to interrupt the stalker wind-up");
+    assert(repelled.x > repelStartX, "lamp did not push the Stalker away from the player");
+    assert(env.errors.length === 0, "Rift Stalker update errors:\n" + env.errors.join("\n"));
   });
 
   /* ---- T11: long soak — 8 sectors of chaotic input ---- */
@@ -621,7 +694,7 @@ if (require.main === module) {
     assert(BP.G.mode === "win", "expected win mode, got " + BP.G.mode);
     assert(!w.document.getElementById("screen-win").classList.contains("hidden"), "victory screen never shown");
     pump(w, 60, 16.7);
-    assert(w.document.getElementById("win-stats").children.length === 11, "victory stats incomplete");
+    assert(w.document.getElementById("win-stats").children.length === 12, "victory stats incomplete");
   });
 
   /* ---- T13: canvas hygiene — no NaN geometry, sane draw-call volume ---- */
@@ -818,6 +891,7 @@ if (require.main === module) {
     assert(unlocks.skitter === 2, "skitter unlock " + unlocks.skitter);
     assert(unlocks.screamer === 4, "screamer unlock " + unlocks.screamer);
     assert(unlocks.brood === 5, "brood unlock " + unlocks.brood);
+    assert(unlocks.rift === 6, "rift stalker unlock " + unlocks.rift);
     assert(BP.api.sectorSubtitle(1).length > 3, "sector subtitle missing");
     assert(BP.api.rankFor(1e9) === "S+" && BP.api.rankFor(0) === "E", "rank table broken");
   });

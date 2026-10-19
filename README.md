@@ -19,6 +19,11 @@ A self-contained, top-down twin-stick survival shooter. Descend through HADAL-9,
 - Every pick is saved in a route history. The ending is shaped by the doctrine used most often; a balanced route has its own outcome. Five distinct epilogues and an ending archive make alternate outcomes discoverable.
 - Five earned palettes recolor the interface, suit, lamp, minimap, and in-game HUD: Cryo Glass (default), Reactor Ember (reach sector 3), Spore Bloom (reach sector 5), Deep Signal (defeat the Warden), and Daybreak (complete a career run). Equip them in **HADAL Armory → Visual themes**.
 
+### New gameplay features
+
+- **Sector contracts:** every deck draws a fresh optional objective—fight with the lamp off, dash six times, take no damage, purge quickly, or hunt a marked elite/Rift Stalker. Progress appears in the HUD and pause screen; successfully reaching the lift banks bonus score and salvage. Contracts rotate without repeating back-to-back and archive sorties remain non-ranked.
+- **Rift Stalker:** a new cloaked morphology enters the enemy pool from sector 6. It flanks in darkness, telegraphs a fast pounce, can be interrupted/repelled by the suit lamp, and is especially valuable when a Rift Hunt contract is active.
+
 ### Post-game and progression
 
 - Victory and defeat reports now include run statistics, the chosen branch history, a projected or discovered ending, newly earned citations, and any palette unlocks.
@@ -85,15 +90,15 @@ npm run balance
 npm run qa
 ```
 
-The automated suite has **34 passing test groups**. The jsdom Canvas mock records draw calls and checks non-finite geometry and gradients; a Web Audio stub validates scheduled parameters. Tests cover the refreshed title command deck, complete campaign loop, persistence and veteran-profile migration, refresh-rate regressions, biomes and hazards, all three alternate fires, the Warden, career victory, branch choice/history/endings, the five-ending reward, New Game+ scaling, cosmetic persistence, non-ranked archive replays, desktop pointer-lock aiming, and the persistent settings screen.
+The automated suite has **36 passing test groups**. The jsdom Canvas mock records draw calls and checks non-finite geometry and gradients; a Web Audio stub validates scheduled parameters. Tests cover the refreshed title command deck, sector-contract rotation and rewards, all five enemy archetypes and Rift Stalker counterplay, the complete campaign loop, persistence and veteran-profile migration, refresh-rate regressions, biomes and hazards, all three alternate fires, the Warden, career victory, branch choice/history/endings, the five-ending reward, New Game+ scaling, cosmetic persistence, non-ranked archive replays, desktop pointer-lock aiming, and the persistent settings screen.
 
-`qa/balance-bot.js` is a stress/pacing probe using weapon selection, ballistic leading, route planning, dodges, pickup priorities, and energy modes. It is not a victory guarantee. Latest sample: 3 trials, 0 victories, average sector 5.0, deepest sector 5, and no runtime errors.
+`qa/balance-bot.js` is a stress/pacing probe using weapon selection, ballistic leading, route planning, dodges, pickup priorities, and energy modes. It is not a victory guarantee. Latest sample: 3 trials, 0 victories, average sector 5.0, deepest sector 7, and no runtime errors.
 
 ## Files
 
 ```text
 index.html          Complete playable game: HTML, CSS, procedural art, Web Audio, and all game systems
-qa/harness.js       34-group headless QA suite
+qa/harness.js       36-group headless QA suite
 qa/balance-bot.js   Autonomous gameplay/pacing probe
 qa/package.json     jsdom dependency for QA only
 README.md           This guide and changelog
