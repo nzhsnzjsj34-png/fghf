@@ -11,7 +11,10 @@ A self-contained, top-down twin-stick survival shooter. Descend through HADAL-9,
 
 ### Visual and choice redesign
 
-- The hangar, branch drafts, route archive, and end screens use a crisp system-sans display face, clearer contrast, rounded glass panels, restrained motion, and keyboard-focus styling. Reduced-motion preferences are respected.
+- The title screen is now an asymmetric command deck: cinematic launch briefing, mission objective, career telemetry, animated depth sonar, full quick-reference controls, and a responsive utility dock.
+- The arena has deterministic per-sector deck plating, bevels, fasteners, scuffs, and illuminated bulkhead rails. The suit silhouette has layered armor and a lit visor; glass-backed HUD plates improve contrast without obscuring the fight. A procedural pressure iris gives the title backdrop more depth.
+- All art remains procedural Canvas/CSS; there are no remote fonts, images, libraries, or CDNs. Reduced-motion preferences are respected.
+- The hangar, branch drafts, route archive, and end screens use a crisp system-sans display face, clearer contrast, rounded glass panels, restrained motion, and keyboard-focus styling.
 - Sector drafts now show **three distinct, color-coded doctrines** at a time: red **Assault**, green **Survival**, cyan **Engineering**, violet **Ghost**, and gold **Signal**. Each choice has an icon, a short practical effect, and mouse, touch, keyboard, and screen-reader support.
 - Every pick is saved in a route history. The ending is shaped by the doctrine used most often; a balanced route has its own outcome. Five distinct epilogues and an ending archive make alternate outcomes discoverable.
 - Five earned palettes recolor the interface, suit, lamp, minimap, and in-game HUD: Cryo Glass (default), Reactor Ember (reach sector 3), Spore Bloom (reach sector 5), Deep Signal (defeat the Warden), and Daybreak (complete a career run). Equip them in **HADAL Armory → Visual themes**.
@@ -82,15 +85,15 @@ npm run balance
 npm run qa
 ```
 
-The automated suite has **33 passing test groups**. The jsdom Canvas mock records draw calls and checks non-finite geometry and gradients; a Web Audio stub validates scheduled parameters. Tests cover the complete campaign loop, persistence and veteran-profile migration, refresh-rate regressions, biomes and hazards, all three alternate fires, the Warden, career victory, branch choice/history/endings, the five-ending reward, New Game+ scaling, cosmetic persistence, non-ranked archive replays, desktop pointer-lock aiming, and the persistent settings screen.
+The automated suite has **34 passing test groups**. The jsdom Canvas mock records draw calls and checks non-finite geometry and gradients; a Web Audio stub validates scheduled parameters. Tests cover the refreshed title command deck, complete campaign loop, persistence and veteran-profile migration, refresh-rate regressions, biomes and hazards, all three alternate fires, the Warden, career victory, branch choice/history/endings, the five-ending reward, New Game+ scaling, cosmetic persistence, non-ranked archive replays, desktop pointer-lock aiming, and the persistent settings screen.
 
-`qa/balance-bot.js` is a stress/pacing probe using weapon selection, ballistic leading, route planning, dodges, pickup priorities, and energy modes. It is not a victory guarantee. Latest sample: 3 trials, 0 victories, average sector 4.3, deepest sector 6, and no runtime errors.
+`qa/balance-bot.js` is a stress/pacing probe using weapon selection, ballistic leading, route planning, dodges, pickup priorities, and energy modes. It is not a victory guarantee. Latest sample: 3 trials, 0 victories, average sector 5.0, deepest sector 5, and no runtime errors.
 
 ## Files
 
 ```text
 index.html          Complete playable game: HTML, CSS, procedural art, Web Audio, and all game systems
-qa/harness.js       33-group headless QA suite
+qa/harness.js       34-group headless QA suite
 qa/balance-bot.js   Autonomous gameplay/pacing probe
 qa/package.json     jsdom dependency for QA only
 README.md           This guide and changelog

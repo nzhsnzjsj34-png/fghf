@@ -271,6 +271,20 @@ if (require.main === module) {
     assert(env.errors.length === 0, "errors during menu frames:\n" + env.errors.join("\n"));
   });
 
+  /* ---- Visual refresh: preserve every launch action and control in the command deck. ---- */
+  check("visual command deck retains career telemetry, launch actions and all controls", () => {
+    const d = env.window.document;
+    const menu = d.getElementById("screen-menu");
+    assert(menu.classList.contains("menu-screen"), "command-deck layout class missing");
+    assert(menu.querySelector(".menu-layout .menu-hero"), "launch briefing missing");
+    assert(menu.querySelector(".menu-intel .depth-sonar"), "procedural depth display missing");
+    assert(menu.querySelectorAll(".menu-control-grid .ctrl").length === 16, "field control reference is incomplete");
+    for (const id of ["btn-start", "btn-menu-ngplus", "btn-archive", "btn-hangar", "btn-how", "btn-options",
+      "rec-score", "rec-sector", "rec-kills", "rec-runs", "rec-salvage", "rec-wins"]) {
+      assert(d.getElementById(id), "menu element missing: " + id);
+    }
+  });
+
   /* ---- T2: start a run, verify sector generation ---- */
   check("startRun generates a valid sector", () => {
     const w = env.window, BP = w.__BP;

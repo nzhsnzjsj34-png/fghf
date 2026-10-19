@@ -327,6 +327,130 @@ h1.title,.mtitle,h2.sub{font-family:Inter,"Aptos Display","Segoe UI",ui-sans-ser
   .archive-stage{min-height:65px}
   .postgame-actions .btn{flex:1 1 42%}
 }
+/* ---------- BLACKOUT command-deck redesign ---------- */
+#screen-menu.menu-screen{
+  align-items:stretch;justify-content:space-between;text-align:left;overflow-y:auto;overflow-x:hidden;
+  padding:clamp(18px,3.1vh,34px) clamp(18px,5vw,78px) 14px;
+  background:
+    radial-gradient(70% 90% at 78% 42%,rgba(17,55,79,.35),transparent 70%),
+    radial-gradient(45% 65% at 8% 82%,rgba(129,57,30,.14),transparent 74%),
+    linear-gradient(110deg,rgba(3,8,14,.86) 0%,rgba(4,11,19,.74) 51%,rgba(3,8,15,.84) 100%);
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  scrollbar-color:rgba(85,156,195,.55) rgba(3,9,16,.7);scrollbar-width:thin;
+}
+#screen-menu.menu-screen::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.36;
+  background-image:linear-gradient(rgba(121,180,205,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(121,180,205,.09) 1px,transparent 1px),linear-gradient(110deg,transparent 0 49.95%,rgba(110,182,205,.12) 50%,transparent 50.08%);
+  background-size:64px 64px,64px 64px,100% 100%;
+  mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.65) 58%,transparent 100%);
+}
+#screen-menu .menu-topbar,#screen-menu .menu-layout,#screen-menu .menu-footer{position:relative;z-index:1}
+#screen-menu .menu-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;flex:none;padding:0 0 13px;border-bottom:1px solid rgba(135,192,210,.18)}
+.menu-brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(123,205,221,.52);border-radius:8px;background:linear-gradient(145deg,rgba(28,89,108,.42),rgba(6,22,33,.8));box-shadow:0 0 22px rgba(45,184,204,.16);color:#bcecf0;font:900 11px ui-monospace,monospace;letter-spacing:.08em}
+.menu-brand>span:last-child{display:grid;gap:3px}
+.menu-brand b{color:#d8edf0;font:800 9px ui-monospace,monospace;letter-spacing:.19em}
+.menu-brand small{color:#6e95a2;font:700 8px ui-monospace,monospace;letter-spacing:.15em}
+.menu-incident{display:flex;align-items:center;gap:9px;color:#d58f76;font:800 9px ui-monospace,monospace;letter-spacing:.14em}
+.menu-incident i,.menu-live-dot,.intel-saved i{width:7px;height:7px;flex:none;border-radius:50%;background:#ff765b;box-shadow:0 0 12px rgba(255,93,66,.8);animation:menu-signal 1.8s ease-in-out infinite}
+.menu-incident b{margin-left:5px;padding:5px 7px;border:1px solid rgba(226,115,81,.25);border-radius:4px;background:rgba(101,35,26,.18);color:#ffae91;font-size:8px}
+.menu-header-code{display:flex;align-items:center;gap:8px;color:#607e88;font:700 8px ui-monospace,monospace;letter-spacing:.17em}
+.menu-header-code b{color:#a6c8ca;font-size:10px}
+@keyframes menu-signal{50%{opacity:.48;box-shadow:0 0 4px rgba(255,93,66,.45)}}
+.menu-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(390px,.85fr);align-items:center;gap:clamp(30px,5vw,80px);width:min(1440px,100%);margin:auto;padding:clamp(22px,3.5vh,40px) 0;flex:1}
+.menu-hero{min-width:0;max-width:790px}
+#screen-menu .menu-hero>.eyebrow{display:flex;align-items:center;gap:9px;margin:0 0 clamp(16px,3vh,28px);color:#81a9af;text-align:left;text-indent:0;font-size:clamp(8px,.9vw,10px);letter-spacing:.2em}
+.menu-live-dot{width:6px;height:6px;background:#7df0cf;box-shadow:0 0 12px rgba(87,240,195,.85);animation:menu-ready 2.1s ease-in-out infinite}
+@keyframes menu-ready{50%{opacity:.62;box-shadow:0 0 5px rgba(87,240,195,.5)}}
+#screen-menu h1.title{max-width:100%;margin:0;text-align:left;font-size:clamp(46px,7.35vw,108px);line-height:.9;letter-spacing:.012em;animation:none;text-shadow:0 2px 1px rgba(0,0,0,.45),0 0 26px rgba(69,181,206,.24),0 0 66px rgba(40,134,170,.2)}
+#screen-menu h1.title .amber{color:#f2ac70;text-shadow:0 0 24px rgba(245,145,82,.28)}
+#screen-menu h2.sub{margin:clamp(18px,2.4vh,26px) 0 0;color:#a7c2c5;text-align:left;text-indent:0;font-size:clamp(11px,1.25vw,15px);font-weight:800;letter-spacing:.29em}
+#screen-menu p.blurb{max-width:56ch;margin:16px 0 0;color:#9bb3b8;text-align:left;font-size:clamp(12px,1.15vw,14px);line-height:1.85;letter-spacing:.015em}
+#screen-menu p.blurb b{color:#f0c091}
+.menu-objective{display:flex;align-items:center;gap:14px;width:min(580px,100%);margin:clamp(19px,3vh,30px) 0 22px;padding:12px 15px;border:1px solid rgba(115,174,183,.2);border-left:2px solid #e29865;border-radius:3px 9px 9px 3px;background:linear-gradient(100deg,rgba(21,45,53,.62),rgba(10,22,29,.28));box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.objective-number{color:#f2b078;font:800 20px/1 ui-monospace,monospace;letter-spacing:-.08em;white-space:nowrap}
+.objective-number span{color:#79999d;font-size:10px;letter-spacing:0}
+.menu-objective>div{display:grid;gap:5px;min-width:0}
+.menu-objective>div b{color:#91b9bb;font:800 8px ui-monospace,monospace;letter-spacing:.18em}
+.menu-objective>div span{color:#c4d5d5;font:500 11px/1.4 Inter,"Segoe UI",sans-serif;letter-spacing:.015em}
+.objective-arrow{margin-left:auto;color:rgba(242,176,120,.7);font-size:17px}
+.menu-launch-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#screen-menu #btn-start{justify-content:flex-start;gap:13px;min-width:min(290px,100%);min-height:54px;margin:0;padding:12px 17px;border:1px solid rgba(244,177,111,.56);border-radius:8px;background:linear-gradient(110deg,rgba(111,66,32,.9),rgba(34,26,21,.94));color:#fff0db;box-shadow:0 8px 28px rgba(0,0,0,.28),0 0 28px rgba(239,143,81,.1);font-size:11px;font-weight:800;letter-spacing:.15em;text-indent:0}
+#screen-menu #btn-start:hover,#screen-menu #btn-start:focus-visible{transform:translateY(-2px);border-color:#ffc28d;background:linear-gradient(110deg,rgba(146,82,39,.96),rgba(47,33,23,.97));box-shadow:0 12px 32px rgba(0,0,0,.38),0 0 34px rgba(239,143,81,.23)}
+.launch-icon{display:grid;place-items:center;width:28px;height:28px;border:1px solid rgba(248,193,143,.32);border-radius:7px;background:rgba(247,174,111,.1);font-size:20px;line-height:1}
+#screen-menu #btn-start .k{margin-left:auto;border-color:rgba(255,211,166,.24);background:rgba(0,0,0,.2);color:#e7b78d;font-size:8px}
+.menu-utility{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;width:min(580px,100%);margin-top:10px}
+#screen-menu .menu-utility .btn{justify-content:flex-start;min-width:0;min-height:40px;margin:0;padding:9px 11px;border-radius:7px;background:rgba(8,20,27,.58);font-size:9px;letter-spacing:.09em;text-indent:0}
+#screen-menu .menu-utility .btn .k{margin-left:auto;padding:2px 5px;font-size:8px}
+#screen-menu .menu-utility .btn:hover{transform:translateY(-1px);border-color:rgba(141,207,213,.48);background:rgba(17,43,52,.78)}
+.menu-intel{position:relative;min-width:0;padding:clamp(15px,2vw,23px);overflow:hidden;border:1px solid rgba(119,173,180,.24);border-radius:14px;background:linear-gradient(145deg,rgba(13,31,38,.91),rgba(5,13,19,.96) 65%);box-shadow:0 24px 70px rgba(0,0,0,.38),0 0 48px rgba(48,147,162,.07);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
+.menu-intel::before{content:"";position:absolute;inset:0 auto 0 0;width:2px;background:linear-gradient(180deg,transparent,#69c8c6 22%,#d99068 72%,transparent);opacity:.8}
+.menu-intel::after{content:"";position:absolute;top:0;right:0;width:48px;height:48px;border-top:1px solid rgba(134,217,210,.3);border-right:1px solid rgba(134,217,210,.3);border-radius:0 13px 0 0;pointer-events:none}
+.menu-intel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(125,177,183,.15)}
+.intel-overline{color:#779ba0;font:800 8px ui-monospace,monospace;letter-spacing:.18em}
+.menu-intel-head h2{margin:4px 0 0;color:#d6e8e6;font:800 clamp(13px,1.3vw,16px) Inter,"Segoe UI",sans-serif;letter-spacing:.025em}
+.intel-saved{display:flex;align-items:center;gap:6px;color:#83b2a8;font:800 7px ui-monospace,monospace;letter-spacing:.14em;white-space:nowrap}
+.intel-saved i{width:5px;height:5px;background:#81e1b5;box-shadow:0 0 9px rgba(92,225,165,.65);animation:none}
+.menu-depth{display:flex;align-items:center;gap:17px;min-height:106px;padding:11px 0;border-bottom:1px solid rgba(125,177,183,.14)}
+.depth-sonar{position:relative;display:grid;place-items:center;width:78px;height:78px;flex:none;overflow:hidden;border:1px solid rgba(106,193,191,.36);border-radius:50%;background:radial-gradient(circle,rgba(37,128,131,.22),rgba(4,18,23,.82) 68%);box-shadow:0 0 26px rgba(46,177,176,.09),inset 0 0 20px rgba(80,196,181,.1)}
+.depth-sonar::before,.depth-sonar::after{content:"";position:absolute;background:rgba(116,206,196,.16)}
+.depth-sonar::before{width:1px;height:100%}.depth-sonar::after{width:100%;height:1px}
+.sonar-ring{position:absolute;border:1px solid rgba(102,190,188,.25);border-radius:50%}
+.ring-one{inset:12px}.ring-two{inset:25px}
+.sonar-sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 72%,rgba(111,230,205,.35) 97%,transparent 100%);animation:sonar-sweep 5s linear infinite}
+@keyframes sonar-sweep{to{transform:rotate(360deg)}}
+.sonar-blip{position:absolute;width:4px;height:4px;border-radius:50%;background:#ff9971;box-shadow:0 0 8px #ff765b}
+.blip-one{top:20px;right:18px}.blip-two{bottom:23px;left:19px;width:3px;height:3px;background:#80e6cc;box-shadow:0 0 7px #80e6cc}
+.depth-sonar>span{position:relative;z-index:1;color:#b8e0da;font:900 9px ui-monospace,monospace;letter-spacing:.1em}
+.depth-readout{display:grid;gap:5px;min-width:0}
+.depth-readout>span{color:#7b9c9d;font:800 8px ui-monospace,monospace;letter-spacing:.19em}
+.depth-readout strong{color:#e4eeee;font:800 clamp(22px,2.5vw,31px)/1 ui-monospace,monospace;letter-spacing:.01em}
+.depth-readout strong small{margin-left:5px;color:#91b8b5;font-size:10px;letter-spacing:.15em}
+.depth-readout>b{color:#d58c71;font:800 8px ui-monospace,monospace;letter-spacing:.12em}
+.depth-readout>b i{padding:0 3px;color:#779b9c;font-style:normal}
+#screen-menu .menu-records{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin:12px 0 13px;padding:1px;border:1px solid rgba(119,173,180,.12);border-radius:8px;background:rgba(4,10,15,.62)}
+#screen-menu .menu-records>div{display:grid;gap:6px;min-width:0;min-height:48px;padding:8px 9px;background:rgba(17,37,42,.37)}
+#screen-menu .menu-records>div span{overflow:hidden;color:#759393;font:800 7px ui-monospace,monospace;letter-spacing:.09em;text-overflow:ellipsis;white-space:nowrap}
+#screen-menu .menu-records b{color:#d6e5df;font:800 15px/1 ui-monospace,monospace;letter-spacing:.02em}
+.menu-subhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
+.menu-subhead b{color:#9dbdbb;font:800 8px ui-monospace,monospace;letter-spacing:.15em}
+.menu-subhead span{color:#587877;font:700 7px ui-monospace,monospace;letter-spacing:.12em}
+#screen-menu .menu-control-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 11px;width:100%;max-height:154px;margin:0;padding:1px 2px 3px;overflow:auto;scrollbar-color:rgba(85,156,160,.45) rgba(3,9,16,.45);scrollbar-width:thin}
+#screen-menu .menu-control-grid .ctrl{gap:4px;min-width:0;min-height:24px;color:#91aaa9;font-size:9px;letter-spacing:0}
+#screen-menu .menu-control-grid kbd{min-width:20px;padding:2px 4px;border-color:rgba(106,174,179,.28);border-bottom-width:1px;border-radius:3px;background:linear-gradient(180deg,#1b3438,#0b1c21);color:#c6ddda;font:800 8px ui-monospace,monospace;white-space:nowrap;box-shadow:none}
+#screen-menu .menu-control-grid .ctrl small{margin-left:auto;color:#698787;font:700 7px ui-monospace,monospace;letter-spacing:.04em;text-align:right;white-space:nowrap}
+#screen-menu .menu-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;flex:none;padding-top:11px;border-top:1px solid rgba(135,192,210,.15)}
+#screen-menu .menu-footer .tiny{margin:0;color:#65848a;text-align:left;font-size:8px;letter-spacing:.07em}
+.menu-footer-mark{color:#617c80;font:700 7px ui-monospace,monospace;letter-spacing:.13em;white-space:nowrap}
+.menu-footer-mark i{padding:0 5px;color:#d1906d;font-style:normal}
+@media(max-width:980px){
+  #screen-menu .menu-layout{grid-template-columns:minmax(0,1fr);gap:20px;align-items:start;width:min(700px,100%);padding:26px 0;flex:none}
+  #screen-menu .menu-hero{max-width:700px}
+  #screen-menu .menu-intel{width:100%}
+  #screen-menu .menu-control-grid{max-height:180px}
+}
+@media(max-width:620px){
+  #screen-menu.menu-screen{padding:14px 16px 12px}
+  #screen-menu .menu-topbar{gap:8px;padding-bottom:10px}
+  .brand-mark{width:30px;height:30px}
+  .menu-brand b{font-size:8px}.menu-brand small{font-size:7px}
+  .menu-incident{gap:5px;font-size:7px;letter-spacing:.08em}
+  .menu-incident b{margin-left:1px;padding:4px;font-size:7px}
+  .menu-header-code{display:none}
+  #screen-menu .menu-layout{gap:16px;padding:22px 0}
+  #screen-menu .menu-hero>.eyebrow{font-size:7px;letter-spacing:.12em}
+  #screen-menu h1.title{font-size:clamp(42px,12vw,70px)}
+  #screen-menu h2.sub{font-size:10px;letter-spacing:.2em}
+  #screen-menu p.blurb{font-size:12px;line-height:1.7}
+  .menu-objective{margin:17px 0;padding:10px 11px}
+  .menu-objective>div span{font-size:10px}
+  #screen-menu .menu-intel{padding:14px}
+  .depth-sonar{width:68px;height:68px}
+  #screen-menu .menu-records{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #screen-menu .menu-control-grid{gap:3px 7px;max-height:190px}
+  #screen-menu .menu-footer{align-items:flex-start;flex-direction:column;gap:5px}
+  .menu-footer-mark{font-size:6px}
+}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
@@ -347,53 +471,80 @@ h1.title,.mtitle,h2.sub{font-family:Inter,"Aptos Display","Segoe UI",ui-sans-ser
   </div>
 
   <!-- ============ TITLE ============ -->
-  <div id="screen-menu" class="screen">
-    <p class="eyebrow">HADAL-9 SUBTERRANEAN RESEARCH STATION &nbsp;•&nbsp; DEPTH 4.2 KM &nbsp;•&nbsp; POWER: OFFLINE</p>
-    <h1 class="title">Blackout <span class="amber">Protocol</span></h1>
-    <h2 class="sub">Ten sectors down. Nothing down there likes the light.</h2>
-    <p class="blurb">
-      The station went dark eleven days ago. The things that came up through the vents are
-      <b>photophobic</b> — your suit lamp burns them, and they can feel it. But every muzzle flash
-      is a <b>dinner bell</b> that echoes through the whole sector. Move quietly, light them up,
-      recover the <b>signal cores</b>, and take the lift deeper.
-    </p>
-    <hr class="rule">
-    <div class="ctrls">
-      <div class="ctrl"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><small>move</small></div>
-      <div class="ctrl"><kbd>MOUSE</kbd><small>aim lamp + weapons</small></div>
-      <div class="ctrl"><kbd>LMB</kbd><small>fire</small></div>
-      <div class="ctrl"><kbd>RMB</kbd><kbd>G</kbd><small>alt-fire · energy</small></div>
-      <div class="ctrl"><kbd>SHIFT</kbd><small>dash · i-frames</small></div>
-      <div class="ctrl"><kbd>E</kbd><small>flare · stun + reveal</small></div>
-      <div class="ctrl"><kbd>R</kbd><small>reload</small></div>
-      <div class="ctrl"><kbd>Q</kbd><small>radar pulse</small></div>
-      <div class="ctrl"><kbd>T</kbd><small>lamp on/off · stealth</small></div>
-      <div class="ctrl"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><small>swap weapon</small></div>
-      <div class="ctrl"><kbd>F</kbd><small>cycle weapon</small></div>
-      <div class="ctrl"><kbd>ESC</kbd><small>pause · release mouse</small></div>
-      <div class="ctrl"><kbd>M</kbd><small>mute</small></div>
-      <div class="ctrl"><kbd>A</kbd><small>sector archive</small></div>
-      <div class="ctrl"><kbd>N</kbd><small>new game+ if unlocked</small></div>
-      <div class="ctrl"><kbd>O</kbd><small>system settings</small></div>
+  <div id="screen-menu" class="screen menu-screen">
+    <header class="menu-topbar">
+      <div class="menu-brand"><span class="brand-mark">H9</span><span><b>HADAL NETWORK</b><small>SUBTERRANEAN OPERATIONS</small></span></div>
+      <div class="menu-incident"><i></i><span>CONTAINMENT FAILURE</span><b>DAY 11</b></div>
+      <div class="menu-header-code"><span>OPERATION</span><b>09—B</b></div>
+    </header>
+
+    <div class="menu-layout">
+      <section class="menu-hero" aria-label="Blackout Protocol launch">
+        <p class="eyebrow"><span class="menu-live-dot"></span> HADAL-9 RESEARCH STATION &nbsp; / &nbsp; DEPTH 4.20 KM</p>
+        <h1 class="title">Blackout <span class="amber">Protocol</span></h1>
+        <h2 class="sub">THE DARK IS NOT EMPTY.</h2>
+        <p class="blurb">The station went silent eleven days ago. Your suit lamp burns the photophobic things in the vents—but light draws them in. Recover the <b>signal cores</b>, reach the lift, and descend before the station notices you.</p>
+
+        <div class="menu-objective">
+          <span class="objective-number">01<span>/10</span></span>
+          <div><b>MISSION OBJECTIVE</b><span>Clear five waves · secure the cores · reach the lift</span></div>
+          <span class="objective-arrow" aria-hidden="true">↘</span>
+        </div>
+
+        <div class="menu-launch-row">
+          <button class="btn primary" id="btn-start"><span class="launch-icon" aria-hidden="true">↓</span><span>Begin Descent</span><span class="k">ENTER</span></button>
+          <button class="btn ghost hidden" id="btn-menu-ngplus">New Game+ <span data-ngplus-label>1</span> <span class="k">N</span></button>
+        </div>
+        <nav class="menu-utility" aria-label="Station systems">
+          <button class="btn ghost" id="btn-archive">Sector Archive <span class="k">A</span></button>
+          <button class="btn ghost" id="btn-hangar">HADAL Armory</button>
+          <button class="btn ghost" id="btn-how">Field Manual</button>
+          <button class="btn ghost" id="btn-options">System Settings <span class="k">O</span></button>
+        </nav>
+      </section>
+
+      <aside class="menu-intel" aria-label="Career telemetry and field controls">
+        <div class="menu-intel-head">
+          <div><span class="intel-overline">PILOT DOSSIER</span><h2>Career telemetry</h2></div>
+          <span class="intel-saved"><i></i>LOCAL FILE</span>
+        </div>
+        <div class="menu-depth">
+          <div class="depth-sonar" aria-hidden="true"><i class="sonar-ring ring-one"></i><i class="sonar-ring ring-two"></i><i class="sonar-sweep"></i><i class="sonar-blip blip-one"></i><i class="sonar-blip blip-two"></i><span>H9</span></div>
+          <div class="depth-readout"><span>DESCENT ZONE</span><strong>04.20<small>KM</small></strong><b>SECTOR 01 <i>·</i> SIGNAL LOST</b></div>
+        </div>
+        <div class="records menu-records">
+          <div><span>BEST SCORE</span><b id="rec-score">0</b></div>
+          <div><span>DEEPEST</span><b id="rec-sector">0</b></div>
+          <div><span>CONFIRMED KILLS</span><b id="rec-kills">0</b></div>
+          <div><span>DEPLOYMENTS</span><b id="rec-runs">0</b></div>
+          <div><span>BANKED SALVAGE</span><b id="rec-salvage">0</b></div>
+          <div><span>SURFACE BREAKS</span><b id="rec-wins">0</b></div>
+        </div>
+        <div class="menu-controls-block">
+          <div class="menu-subhead"><b>FIELD CONTROLS</b><span>QUICK REFERENCE</span></div>
+          <div class="ctrls menu-control-grid">
+            <div class="ctrl"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><small>move</small></div>
+            <div class="ctrl"><kbd>MOUSE</kbd><small>aim / fire</small></div>
+            <div class="ctrl"><kbd>LMB</kbd><small>primary fire</small></div>
+            <div class="ctrl"><kbd>RMB</kbd><kbd>G</kbd><small>alternate fire</small></div>
+            <div class="ctrl"><kbd>SHIFT</kbd><small>dash</small></div>
+            <div class="ctrl"><kbd>E</kbd><small>flare</small></div>
+            <div class="ctrl"><kbd>Q</kbd><small>radar pulse</small></div>
+            <div class="ctrl"><kbd>T</kbd><small>lamp / stealth</small></div>
+            <div class="ctrl"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><small>swap weapon</small></div>
+            <div class="ctrl"><kbd>R</kbd><small>reload</small></div>
+            <div class="ctrl"><kbd>ESC</kbd><small>pause / unlock</small></div>
+            <div class="ctrl"><kbd>M</kbd><small>mute audio</small></div>
+            <div class="ctrl"><kbd>A</kbd><small>sector archive</small></div>
+            <div class="ctrl"><kbd>N</kbd><small>new game+</small></div>
+            <div class="ctrl"><kbd>O</kbd><small>settings</small></div>
+            <div class="ctrl"><kbd>F</kbd><small>cycle weapon</small></div>
+          </div>
+        </div>
+      </aside>
     </div>
-    <div class="records">
-      <div>Best Score <b id="rec-score">0</b></div>
-      <div>Deepest Sector <b id="rec-sector">0</b></div>
-      <div>Confirmed Kills <b id="rec-kills">0</b></div>
-      <div>Runs <b id="rec-runs">0</b></div>
-      <div>Salvage <b id="rec-salvage">0</b></div>
-      <div>Surface breaks <b id="rec-wins">0</b></div>
-    </div>
-    <hr class="rule">
-    <div>
-      <button class="btn primary" id="btn-start">Descend <span class="k">ENTER</span></button>
-      <button class="btn ghost hidden" id="btn-menu-ngplus">New Game+ <span data-ngplus-label>1</span> <span class="k">N</span></button>
-      <button class="btn ghost" id="btn-archive">Sector Archive <span class="k">A</span></button>
-      <button class="btn ghost" id="btn-hangar">HADAL Armory</button>
-      <button class="btn ghost" id="btn-how">Field Manual</button>
-      <button class="btn ghost" id="btn-options">System Settings <span class="k">O</span></button>
-    </div>
-    <p class="tiny" id="touch-hint">Keyboard + mouse recommended &nbsp;•&nbsp; desktop mouse captures on descent &nbsp;•&nbsp; touch controls auto-enable on mobile</p>
+
+    <footer class="menu-footer"><p class="tiny" id="touch-hint">Keyboard + mouse recommended &nbsp;•&nbsp; desktop pointer locks on descent &nbsp;•&nbsp; touch controls auto-enable on mobile</p><span class="menu-footer-mark">NO EXTRACTION GUARANTEED <i>///</i> HADAL-9</span></footer>
   </div>
 
   <!-- ============ PERMANENT HANGAR / PROFILE ============ -->
@@ -5197,6 +5348,47 @@ function render() {
 }
 
 /* --- floor --- */
+function deckDetailNoise(seed, x, y) {
+  let n = (seed ^ Math.imul(x + 0x45d9f3b, 0x119de1f3) ^ Math.imul(y + 0x27d4eb2d, 0x3449f5)) >>> 0;
+  n = Math.imul(n ^ (n >>> 16), 0x45d9f3b);
+  n = Math.imul(n ^ (n >>> 16), 0x45d9f3b);
+  return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
+}
+
+function drawFloorWear(run, x0, y0, x1, y1, theme) {
+  const cell = 96;
+  const seed = (run.seed ^ Math.imul(run.sector, 0x9E3779B1)) >>> 0;
+  const cx0 = Math.max(0, Math.floor(x0 / cell)), cy0 = Math.max(0, Math.floor(y0 / cell));
+  const cx1 = Math.min(Math.ceil(CFG.ARENA_W / cell), Math.ceil(x1 / cell));
+  const cy1 = Math.min(Math.ceil(CFG.ARENA_H / cell), Math.ceil(y1 / cell));
+  for (let cy = cy0; cy < cy1; cy++) for (let cx = cx0; cx < cx1; cx++) {
+    const roll = deckDetailNoise(seed, cx, cy);
+    const tx = cx * cell, ty = cy * cell, inset = 8 + roll * 5;
+    ctx.strokeStyle = "rgba(" + theme.seam + "," + (0.035 + roll * 0.035).toFixed(3) + ")";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(tx + inset, ty + inset, cell - inset * 2, cell - inset * 2);
+
+    // A few deterministic fasteners and brushed-metal scuffs break up the clean grid.
+    ctx.fillStyle = "rgba(" + theme.grid + ",.16)";
+    const bolt = 8;
+    ctx.fillRect(tx + bolt, ty + bolt, 2, 2);
+    ctx.fillRect(tx + cell - bolt - 2, ty + bolt, 2, 2);
+    ctx.fillRect(tx + bolt, ty + cell - bolt - 2, 2, 2);
+    ctx.fillRect(tx + cell - bolt - 2, ty + cell - bolt - 2, 2, 2);
+    if (roll > 0.38) {
+      const sx = tx + 17 + roll * 29, sy = ty + 22 + deckDetailNoise(seed ^ 0xA511E9B3, cx, cy) * 48;
+      ctx.strokeStyle = "rgba(" + theme.seam + ",.09)";
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + 8 + roll * 18, sy + 1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx + 5, sy + 4); ctx.lineTo(sx + 12 + roll * 12, sy + 4); ctx.stroke();
+    }
+    if (roll > 0.86) {
+      ctx.fillStyle = theme.hazardCol + "1f";
+      ctx.fillRect(tx + cell - 19, ty + 15, 8, 2);
+      ctx.fillRect(tx + cell - 15, ty + 20, 4, 2);
+    }
+  }
+}
+
 function drawFloor(run, ox, oy) {
   const W = CFG.ARENA_W, H = CFG.ARENA_H, WALL = CFG.WALL;
   const x0 = Math.max(0, -ox), y0 = Math.max(0, -oy);
@@ -5227,6 +5419,9 @@ function drawFloor(run, ox, oy) {
   for (let y = Math.floor(y0 / bs) * bs; y < y1; y += bs) { ctx.moveTo(x0, y); ctx.lineTo(x1, y); }
   ctx.stroke();
 
+  // Per-sector deterministic plate bevels, fasteners and worn paint give the deck a tactile finish.
+  drawFloorWear(run, x0, y0, x1, y1, theme);
+
   // sector stencil
   ctx.save();
   ctx.globalAlpha = 0.055;
@@ -5245,9 +5440,23 @@ function drawFloor(run, ox, oy) {
   ctx.setLineDash([26, 18]);
   ctx.strokeRect(WALL, WALL, W - WALL * 2, H - WALL * 2);
   ctx.setLineDash([]);
-  ctx.strokeStyle = "rgba(120,190,255,.16)";
+  ctx.strokeStyle = "rgba(" + theme.seam + ",.18)";
   ctx.lineWidth = 1;
   ctx.strokeRect(WALL + 7, WALL + 7, W - (WALL + 7) * 2, H - (WALL + 7) * 2);
+
+  // Recessed wall rails and evenly spaced safety lamps frame the playable deck.
+  ctx.strokeStyle = "rgba(" + theme.grid + ",.16)";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(WALL + 13, WALL + 13, W - (WALL + 13) * 2, H - (WALL + 13) * 2);
+  ctx.fillStyle = theme.hazardCol + "35";
+  for (let x = WALL + 48; x < W - WALL - 24; x += 192) {
+    ctx.fillRect(x, WALL * 0.46, 24, 3);
+    ctx.fillRect(x + 34, H - WALL * 0.54, 12, 3);
+  }
+  for (let y = WALL + 48; y < H - WALL - 24; y += 192) {
+    ctx.fillRect(WALL * 0.46, y, 3, 24);
+    ctx.fillRect(W - WALL * 0.54, y + 34, 3, 12);
+  }
 }
 
 function drawPillars(run) {
@@ -5659,29 +5868,49 @@ function drawPlayer(run) {
   const bob = Math.sin(p.walk) * 1.4;
   ctx.rotate(p.angle);
 
-  // legs / backpack
-  ctx.fillStyle = "#26374a";
-  ctx.beginPath(); ctx.ellipse(-p.r * 0.55, 0, p.r * 0.62, p.r * 0.86 + bob * 0.2, 0, 0, TAU); ctx.fill();
+  // backpack, articulated boots and a compact pressure-suit silhouette
+  ctx.fillStyle = "#182a38";
+  ctx.fillRect(-p.r * 0.91, -p.r * 0.56, p.r * 0.54, p.r * 1.12);
+  ctx.fillStyle = "#344d5d";
+  ctx.fillRect(-p.r * 0.91, -p.r * 0.42, p.r * 0.17, p.r * 0.84);
+  ctx.fillStyle = "#172431";
+  ctx.beginPath(); ctx.ellipse(-p.r * 0.18, -p.r * 0.73, p.r * 0.36, p.r * 0.22 + bob * 0.08, 0, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-p.r * 0.18, p.r * 0.73, p.r * 0.36, p.r * 0.22 - bob * 0.08, 0, 0, TAU); ctx.fill();
 
-  // torso
+  // layered torso plate and illuminated armor seams
   const hurt = p.hurtFlash > 0;
-  ctx.fillStyle = hurt ? "#ff8f7a" : (p.invuln > 0 && p.dashT <= 0 ? palette.highlight : palette.suit);
+  const suitColor = hurt ? "#ff8f7a" : (p.invuln > 0 && p.dashT <= 0 ? palette.highlight : palette.suit);
+  ctx.fillStyle = suitColor;
   ctx.beginPath(); ctx.arc(0, 0, p.r, 0, TAU); ctx.fill();
   ctx.strokeStyle = hurt ? "#ffd9cc" : palette.accent;
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.arc(0, 0, p.r, 0, TAU); ctx.stroke();
+  ctx.fillStyle = "rgba(5,14,22,.38)";
+  ctx.beginPath(); ctx.moveTo(-p.r * 0.28, -p.r * 0.68); ctx.lineTo(p.r * 0.24, -p.r * 0.5); ctx.lineTo(p.r * 0.2, p.r * 0.48); ctx.lineTo(-p.r * 0.3, p.r * 0.65); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = "rgba(224,244,255,.32)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(-p.r * 0.38, -p.r * 0.54); ctx.lineTo(-p.r * 0.2, -p.r * 0.18); ctx.lineTo(-p.r * 0.36, p.r * 0.43); ctx.stroke();
+  ctx.fillStyle = hurt ? "#fff0df" : palette.accent;
+  ctx.fillRect(-p.r * 0.65, -p.r * 0.13, p.r * 0.12, p.r * 0.26);
 
-  // visor
+  // helmet rim and polarized visor catch the beam
+  ctx.fillStyle = "#10202c";
+  ctx.beginPath(); ctx.ellipse(p.r * 0.3, 0, p.r * 0.49, p.r * 0.65, 0, 0, TAU); ctx.fill();
   ctx.fillStyle = p.dashT > 0 ? "#ffffff" : palette.highlight;
-  ctx.beginPath(); ctx.ellipse(p.r * 0.34, 0, p.r * 0.44, p.r * 0.6, 0, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(p.r * 0.37, 0, p.r * 0.35, p.r * 0.47, 0, 0, TAU); ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,.55)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(p.r * 0.34, -p.r * 0.34); ctx.lineTo(p.r * 0.55, -p.r * 0.18); ctx.stroke();
 
-  // weapon
+  // weapon housing, exposed rail and muzzle cap
   const w = currentWeapon(p);
   ctx.fillStyle = "#1b2836";
   const gl = w.key === "scatter" ? 20 : w.key === "lance" ? 26 : 17;
   ctx.fillRect(p.r * 0.4, -3.4, gl, 6.8);
+  ctx.fillStyle = "#405363";
+  ctx.fillRect(p.r * 0.52, -4.1, Math.max(7, gl * 0.48), 1.4);
   ctx.fillStyle = "#0e1720";
   ctx.fillRect(p.r * 0.4 + gl - 5, -4.6, 5, 9.2);
+  ctx.fillStyle = w.color;
+  ctx.fillRect(p.r * 0.4 + gl - 1.5, -1, 2, 2);
   if (p.reloading > 0) {
     ctx.globalAlpha = 0.9;
     ctx.fillStyle = "#ffd39a";
@@ -6064,6 +6293,23 @@ function drawAimReticle(run) {
 /* ------------------------------------------------------------------ *
  * 27. HUD
  * ------------------------------------------------------------------ */
+function drawHUDPanel(x, y, w, h, rgb, opacity) {
+  const cut = Math.min(9, Math.max(4, h * 0.08));
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x + cut, y); ctx.lineTo(x + w - cut, y); ctx.lineTo(x + w, y + cut);
+  ctx.lineTo(x + w, y + h - cut); ctx.lineTo(x + w - cut, y + h); ctx.lineTo(x + cut, y + h);
+  ctx.lineTo(x, y + h - cut); ctx.lineTo(x, y + cut); ctx.closePath();
+  ctx.fillStyle = "rgba(3,9,16,.72)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(" + rgb + "," + opacity + ")";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = "rgba(" + rgb + ",.72)";
+  ctx.fillRect(x + 10, y, Math.min(30, w * 0.16), 1.5);
+  ctx.restore();
+}
+
 function drawHUD(run) {
   const p = run.player;
   const palette = VISUAL_THEMES[Profile.selectedTheme] || VISUAL_THEMES.ice;
@@ -6071,6 +6317,14 @@ function drawHUD(run) {
   const S = clamp(baseScale * clamp(Number(Profile.prefs.hudScale) || 1, 0.8, 1.25), 0.58, 1.7);
   ctx.save();
   ctx.textBaseline = "alphabetic";
+
+  // Quiet glass plates keep the tactical readouts crisp without hiding the arena.
+  if (VW > 700) {
+    drawHUDPanel(8 * S, 7 * S, 302 * S, 112 * S, palette.rgb, .27);
+    drawHUDPanel(VW - 362 * S, 7 * S, 354 * S, 112 * S, palette.rgb, .25);
+    drawHUDPanel(VW / 2 - 63 * S, 7 * S, 126 * S, 61 * S, palette.rgb, .22);
+    drawHUDPanel(8 * S, VH - 100 * S, 466 * S, 94 * S, palette.rgb, .24);
+  }
 
   /* ---- top-left: integrity + energy ---- */
   const bx = 22 * S, by = 22 * S, bw = 250 * S, bh = 15 * S;
@@ -6481,6 +6735,30 @@ function renderMenuBackdrop() {
   for (let x = 0; x < VW; x += gs) { ctx.moveTo(x, 0); ctx.lineTo(x, VH); }
   for (let y = 0; y < VH; y += gs) { ctx.moveTo(0, y); ctx.lineTo(VW, y); }
   ctx.stroke();
+
+  // A huge sealed pressure iris sits beyond the glass: rings, braces and tiny status lamps.
+  ctx.save();
+  ctx.strokeStyle = "rgba(" + palette.rgb + ",.12)";
+  ctx.lineWidth = 1;
+  const gateX = VW * 0.79, gateY = VH * 0.47, gateR = Math.min(VW, VH) * 0.29;
+  ctx.strokeRect(gateX - gateR * 1.22, gateY - gateR * 1.22, gateR * 2.44, gateR * 2.44);
+  for (const scale of [1, 0.84, 0.65]) {
+    ctx.beginPath(); ctx.arc(gateX, gateY, gateR * scale, 0, TAU); ctx.stroke();
+  }
+  for (let i = 0; i < 12; i++) {
+    const a = i * TAU / 12;
+    const inner = gateR * 0.72, outer = gateR * 1.12;
+    ctx.beginPath();
+    ctx.moveTo(gateX + Math.cos(a) * inner, gateY + Math.sin(a) * inner);
+    ctx.lineTo(gateX + Math.cos(a) * outer, gateY + Math.sin(a) * outer);
+    ctx.stroke();
+    ctx.fillStyle = i % 3 === 0 ? "rgba(255,130,91,.32)" : "rgba(" + palette.rgb + ",.28)";
+    ctx.beginPath(); ctx.arc(gateX + Math.cos(a) * gateR * 1.16, gateY + Math.sin(a) * gateR * 1.16, 1.5, 0, TAU); ctx.fill();
+  }
+  ctx.strokeStyle = "rgba(" + palette.rgb + ",.08)";
+  ctx.beginPath(); ctx.moveTo(gateX - gateR * 1.3, gateY); ctx.lineTo(gateX + gateR * 1.3, gateY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(gateX, gateY - gateR * 1.3); ctx.lineTo(gateX, gateY + gateR * 1.3); ctx.stroke();
+  ctx.restore();
 
   // sweeping lamp
   const cx = VW * 0.5, cy = VH * 0.62;
