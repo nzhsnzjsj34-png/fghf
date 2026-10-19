@@ -1,0 +1,14 @@
+{
+  "name": "blackout-protocol-qa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Headless QA harness and balance bot for BLACKOUT PROTOCOL (index.html at the repo root).",
+  "scripts": {
+    "test": "node harness.js",
+    "balance": "node balance-bot.js 3",
+    "qa": "node harness.js && node balance-bot.js 3"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}

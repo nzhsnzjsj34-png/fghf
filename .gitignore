@@ -1,0 +1,8 @@
+# QA tooling dependencies (the game itself has zero dependencies)
+node_modules/
+package-lock.json
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
