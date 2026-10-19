@@ -1,24 +1,36 @@
-# BLACKOUT PROTOCOL — Arsenal Edition
+# BLACKOUT PROTOCOL — The Branching Descent
 
-A self-contained, top-down twin-stick survival shooter. Descend through HADAL-9, an abandoned research station 4.2 km below the surface. Your suit lamp is your only weapon against the photophobic wildlife; every gunshot tells the whole sector where you are.
+A self-contained, top-down twin-stick survival shooter. Descend through HADAL-9, an abandoned research station 4.2 km below the surface. Your suit lamp is your only weapon against photophobic wildlife; every gunshot tells the whole sector where you are.
 
-**Play:** open `index.html`, or serve the repository with `python3 -m http.server 8000 --bind 0.0.0.0` and visit `/index.html`.
-**Dependencies:** none for the game. All art is drawn in Canvas; all sound is synthesised using Web Audio.
+**Play:** open `index.html`, or run `python3 -m http.server 8000 --bind 0.0.0.0` and visit `/index.html`.
+**Game dependencies:** none. Art is drawn with Canvas and every sound is synthesized with Web Audio. There are no remote fonts, images, libraries, or CDNs.
 
 ---
 
-## Upgrade changelog
+## Changelog
 
-This edition expands the original BLACKOUT PROTOCOL while retaining its complete combat/progression loop, procedural rendering, audio synthesis, touch controls, records, and pause/death/victory states.
+### Visual and choice redesign
 
-- **Persistent HADAL Armory.** Salvage earned in each run buys 11 permanent upgrades: integrity plating, weapon damage, energy capacity, lamp performance, dash, flares, magazines, a starting sentry drone, score/salvage, a one-use defibrillator, and a selectable starting weapon. Purchases persist locally between descents.
-- **Achievement citations.** 18 first-time achievements award more salvage, from a first kill and high combo to dark kills, hazard kills, elite kills, a defibrillator save, and defeating the Warden.
-- **Three weapon-specific alternate fires.** Hold right mouse or `G`: the Pulse SMG channels an energy beam, the Breach-12 lays proximity mines, and the Arc Lance raises a frontal Aegis that intercepts projectiles. Touch has a dedicated Alt button.
-- **Five sector biomes and live hazards.** Maintenance Spine, Hydroponic Bloom, Coolant Ring, Specimen Vault, and The Nest introduce cyclic steam jets, corrosive spore pools, arcing busbars, and readable hydraulic presses. Each sector also rolls one of nine rule-changing protocols, such as Swarm, Carapace, Brownout, Scarcity, Bounty, or Volatility.
-- **Seven elite affixes.** Armoured, Swift, Volatile, Leech, Shroud, Matriarch, and Splitter hostiles add readable, stackable variations to standard enemies.
-- **A three-phase sector-10 finale.** The Warden of the Core telegraphs radial and aimed volleys, charges, summons adds, and spirals a phase-three barrage. Its charge leaves temporary void pools and its proximity suppresses the lamp.
-- **Juice and combat feedback.** Damage numbers, kill-streak callouts, capped decals, lightning chains, temporary Overdrive and Aegis pickups, boss hit/phase effects, and added procedural Web Audio voices. Screen shake, damage numbers, ambient music, and audio can be configured in the hangar.
-- **Performance and integrity.** The fixed 1/120-second simulation, accumulator stall guard, 150px spatial hash, bounded effects/projectiles, and renderer/audio QA remain in place. There are no timer-based gameplay transitions.
+- The hangar, branch drafts, route archive, and end screens use a crisp system-sans display face, clearer contrast, rounded glass panels, restrained motion, and keyboard-focus styling. Reduced-motion preferences are respected.
+- Sector drafts now show **three distinct, color-coded doctrines** at a time: red **Assault**, green **Survival**, cyan **Engineering**, violet **Ghost**, and gold **Signal**. Each choice has an icon, a short practical effect, and mouse, touch, keyboard, and screen-reader support.
+- Every pick is saved in a route history. The ending is shaped by the doctrine used most often; a balanced route has its own outcome. Five distinct epilogues and an ending archive make alternate outcomes discoverable.
+- Five earned palettes recolor the interface, suit, lamp, minimap, and in-game HUD: Cryo Glass (default), Reactor Ember (reach sector 3), Spore Bloom (reach sector 5), Deep Signal (defeat the Warden), and Daybreak (complete a career run). Equip them in **HADAL Armory → Visual themes**.
+
+### Post-game and progression
+
+- Victory and defeat reports now include run statistics, the chosen branch history, a projected or discovered ending, newly earned citations, and any palette unlocks.
+- **New Game+** unlocks after a career victory. Each clear unlocks the next tier; persistent Armory perks carry over while enemy health, damage, speed, wave pressure, and the Warden scale upward.
+- **Sector Archive** lets you revisit any sector reached in a career run and launch one of five branch starter modules. Archive runs can reveal alternate endings, but do not change ranked records or bank run salvage. First-time citations and ending discoveries persist.
+- Profile data—career records, salvage, upgrades, citations, New Game+ tier, palettes, route endings, and the last run report—loads and saves locally.
+
+### Campaign and combat
+
+- **Persistent HADAL Armory:** 11 permanent upgrades, including integrity, weapon damage, energy, lamp, dash, flares, magazines, drone, score/salvage, a one-use defibrillator, and starting weapon.
+- **19 citations:** first-time achievements award salvage for kills, combos, deep sectors, special weapons, hazards, elites, the Warden, and all five endings.
+- **Three alternate weapon modes:** Pulse SMG overcharge beam, Breach-12 proximity mines, and Arc Lance Aegis.
+- **Five biomes and four hazards:** Maintenance Spine, Hydroponic Bloom, Coolant Ring, Specimen Vault, and The Nest; steam, spore, Tesla, and crusher hazards; nine sector protocols; seven elite affixes.
+- **Sector-10 finale:** the three-phase Warden of the Core telegraphs volleys, charges, summons, and a spiral barrage. Its defeat is required for a career victory.
+- Damage numbers, kill-streak callouts, lightning chains, temporary Overdrive/Aegis pickups, boss phase effects, synthesized audio, touch controls, pause, records, and performance safeguards remain part of the single-file game.
 
 ---
 
@@ -29,27 +41,27 @@ This edition expands the original BLACKOUT PROTOCOL while retaining its complete
 | `W A S D` / arrows | Move |
 | Mouse | Aim |
 | Left mouse / `Space` | Primary fire — hold for auto weapons, click for the Arc Lance |
-| Right mouse / `G` | Hold for the current weapon's energy alternate fire |
+| Right mouse / `G` | Hold for the current weapon's alternate fire |
 | `Shift` | Dash with invulnerability frames |
-| `E` | Flare: stun and reveal nearby hostiles; loud enough to alert the sector |
+| `E` | Flare: stun and reveal nearby hostiles; noisy enough to alert the sector |
 | `Q` | Radar pulse |
-| `T` | Toggle the suit lamp: light burns, reveals, and enrages; darkness conceals you |
+| `T` | Toggle suit lamp: light burns, reveals, and enrages; darkness conceals you |
 | `R` | Reload (also reloads automatically when empty) |
 | `1` / `2` / `3` or `F` | Select / cycle Pulse SMG, Breach-12, Arc Lance |
 | `Esc` / `P` | Pause; the game auto-pauses when the tab loses focus |
+| `A` (title screen) | Open Sector Archive |
+| `N` (after unlock) | Start the latest New Game+ tier |
 | `M` | Toggle audio |
-| `Enter` | Start, redeploy, or confirm |
+| `Enter` | Start or redeploy a standard run |
 | Touch | Left stick moves; right stick aims/fires; Flare, Dash, and Alt buttons are provided |
 
-### Alternate fires
+### Branches and endings
 
-- **Pulse SMG — Overcharge Beam:** continuous, piercing damage along the aim ray; drains energy and emits periodic noise.
-- **Breach-12 — Proximity Mine:** place an armed mine that detonates when a hostile approaches.
-- **Arc Lance — Aegis:** orbit a frontal barrier that absorbs hostile projectiles; energy sustains it.
+Between sectors, pick one module from three offers drawn from different branches. Each module changes the next fight and records a doctrine choice. The most-selected branch determines the final route: **Purge Protocol** (Assault), **Lifeline Protocol** (Survival), **Open Channel** (Engineering), **Ghost Current** (Ghost), or **Echo Archive** (Signal). An even split yields a balanced ending. Route decisions are shown on both the victory report and the Sector Archive.
 
 ### Run loop
 
-Survive five waves, recover the Signal Cores, and stand in the north lift. Between sectors, draft one of three salvage modules. Sector 10 replaces its final wave with the Warden encounter. If the suit fails, the run ends; scores, rank, kills, citations, salvage, and upgrades are stored locally.
+Survive five waves, recover Signal Cores, and stand in the north lift. Between sectors, draft a module. Sector 10 replaces its final wave with the Warden. When the suit fails, the report records your run; scores, citations, salvage, upgrades, cosmetics, and endings are saved on this device.
 
 ---
 
@@ -67,20 +79,18 @@ npm run balance
 npm run qa
 ```
 
-The automated suite currently contains **26 passing test groups**. Its jsdom canvas mock records draw calls and checks non-finite geometry and invalid gradients; its Web Audio stub validates scheduled parameters. Coverage includes the original full game loop and refresh-rate regressions, plus a no-timer source check, armory purchases and persistence, all biomes/hazards, sector modifiers, all alternate fires, timed power-ups, elite damage/effects, the Warden's phases/projectiles, and a boss-gated full victory path.
+The automated suite has **31 passing test groups**. The jsdom Canvas mock records draw calls and checks non-finite geometry and gradients; a Web Audio stub validates scheduled parameters. Tests cover the complete campaign loop, persistence and veteran-profile migration, refresh-rate regressions, biomes and hazards, all three alternate fires, the Warden, career victory, branch choice/history/endings, the five-ending reward, New Game+ scaling, cosmetic persistence, and non-ranked archive replays.
 
-`qa/balance-bot.js` runs an autonomous policy using range-aware weapon selection, ballistic leading, grid-routed pickup/lift movement, kiting, lunge/ring dodges, pickup priorities, and the new energy modes. It is a stress and pacing probe, not a victory guarantee; output includes per-sector elapsed time, damage taken, accuracy, and runtime errors.
-
-Latest sample: 3 trials, average **sector 7.0**, deepest sector 8, 0/3 full clears, and **no runtime errors**. The bot's longest run reached sector 8 in 4.75 minutes; the campaign boss remains a genuine final challenge.
+`qa/balance-bot.js` is a stress/pacing probe using weapon selection, ballistic leading, route planning, dodges, pickup priorities, and energy modes. It is not a victory guarantee. Latest sample: 3 trials, 0 victories, average sector 5.0, deepest sector 7, and no runtime errors.
 
 ## Files
 
 ```text
-index.html          Complete playable game: HTML, CSS, procedural art, Web Audio, game systems
-qa/harness.js       Headless QA suite
+index.html          Complete playable game: HTML, CSS, procedural art, Web Audio, and all game systems
+qa/harness.js       31-group headless QA suite
 qa/balance-bot.js   Autonomous gameplay/pacing probe
 qa/package.json     jsdom dependency for QA only
-README.md           This guide
+README.md           This guide and changelog
 ```
 
-The game is intentionally delivered as one `index.html` file. The `qa/` directory is optional development tooling and is not loaded by the game.
+The complete game is the single self-contained `index.html` file. The optional `qa/` tooling is not loaded by the game.

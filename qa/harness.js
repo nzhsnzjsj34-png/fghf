@@ -166,6 +166,9 @@ function boot(opts) {
       window.matchMedia = q => ({ matches: false, media: q, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
       // no touch by default
       Object.defineProperty(window.navigator, "maxTouchPoints", { value: 0, configurable: true });
+      if (opts.storage && typeof opts.storage === "object") {
+        for (const [key, value] of Object.entries(opts.storage)) window.localStorage.setItem(key, String(value));
+      }
     }
   });
   const window = dom.window;
@@ -966,6 +969,126 @@ if (require.main === module) {
       "a new wave was spawned after the lift opened (W" + run.wave + ", budget " + run.waveBudget + ")");
     assert(run.exit.open && BP.G.mode === "playing", "the open lift was lost before player arrival");
     assert(x.errors.length === 0, "exit scheduling errors:\n" + x.errors.join("\n"));
+    w.close();
+  });
+
+  /* ---- T27: choice doctrine clarity, route history, and post-game dossier ---- */
+  check("CHOICE REDESIGN: three distinct branches record the path and render its ending", () => {
+    const x = boot({ w: 1366, h: 768 }), w = x.window, BP = w.__BP;
+    BP.api.startRun();
+    const run = BP.G.run;
+    BP.api.advanceSector(run);
+    assert(BP.G.mode === "modules", "sector clear did not open branch draft");
+    const cards = Array.from(w.document.querySelectorAll("#mod-cards .card"));
+    assert(cards.length === 3, "branch draft should show three choices");
+    const branchIds = cards.map(card => card.dataset.branch);
+    assert(new Set(branchIds).size === 3, "choice cards do not offer three distinct branches: " + branchIds.join(","));
+    assert(cards.every(card => card.getAttribute("aria-label") && card.style.getPropertyValue("--accent")), "branch cards lack accessible labels or vivid branch colors");
+    const chosen = BP.moduleChoices[1];
+    const chosenBranch = BP.CHOICE_BRANCHES[chosen.tag];
+    BP.api.chooseModule(1);
+    assert(run.choiceHistory.length === 1, "module pick was not stored in run history");
+    assert(run.choiceHistory[0].branchId === chosenBranch.id && run.choiceHistory[0].moduleId === chosen.id, "stored decision does not match chosen route");
+    run.sector = BP.CFG.MAX_SECTOR;
+    BP.api.victory(run);
+    assert(BP.G.mode === "win", "victory recap did not open");
+    assert(w.document.querySelectorAll("#win-choices .history-chip").length === 1, "post-game route recap omitted the chosen branch");
+    assert(w.document.getElementById("win-ending").textContent.includes(BP.ENDINGS[chosenBranch.id].title), "route-specific ending was not shown");
+    assert(BP.Profile.endings[chosenBranch.id], "ending discovery was not persisted");
+    assert(!w.document.getElementById("btn-win-ngplus").classList.contains("hidden"), "first career victory did not unlock New Game+");
+    assert(x.errors.length === 0, "choice/post-game errors:\n" + x.errors.join("\n"));
+    w.close();
+  });
+
+  /* ---- T28: New Game+ scaling, retained upgrades, and palette persistence ---- */
+  check("POST-GAME: New Game+ scales threats and cosmetic unlocks persist across reloads", () => {
+    const x = boot({ w: 1280, h: 720 }), first = x.window, BP1 = first.__BP;
+    BP1.Profile.ngPlusTier = 2;
+    BP1.Profile.upgrades.hp = 1;
+    BP1.Profile.cosmetics.ember = true;
+    BP1.Profile.selectedTheme = "ember";
+    BP1.Profile.save();
+    const storedProfile = first.localStorage.getItem("blackout-protocol-profile-v2");
+    const storedRecords = first.localStorage.getItem("blackout-protocol-records-v1");
+    const y = boot({ w: 1280, h: 720, storage: {
+      "blackout-protocol-profile-v2": storedProfile,
+      "blackout-protocol-records-v1": storedRecords
+    }});
+    const w = y.window, BP = w.__BP;
+    assert(BP.Profile.ngPlusTier === 2, "NG+ tier did not load from local storage");
+    assert(BP.Profile.cosmetics.ember && BP.Profile.selectedTheme === "ember", "palette unlock/equip did not persist");
+    assert(w.document.documentElement.dataset.visualTheme === "ember", "equipped palette was not applied to the interface");
+    const run = BP.api.startNewGamePlus();
+    assert(run && run.ngPlusTier === 2, "New Game+ did not start at the unlocked tier");
+    assert(run.player.maxHp === 112, "persistent armory plating did not carry into NG+");
+    assert(BP.api.waveComposition(5, 3, 2).count > BP.api.waveComposition(5, 3, 0).count, "NG+ did not increase wave pressure");
+    run.sector = 5; run.wave = 2; run.mod = {}; run.ngPlusTier = 0;
+    const base = BP.api.spawnEnemy(run, "lurker", 900, 700, {});
+    const baseHp = base.maxHp, baseDamage = base.dmg;
+    run.enemies.length = 0; run.ngPlusTier = 2;
+    const scaled = BP.api.spawnEnemy(run, "lurker", 900, 700, {});
+    assert(Math.abs(scaled.maxHp / baseHp - 1.4) < 1e-9, "NG+ health scaling is incorrect");
+    assert(Math.abs(scaled.dmg / baseDamage - 1.2) < 1e-9, "NG+ damage scaling is incorrect");
+    assert(y.errors.length === 0, "NG+/theme persistence errors:\n" + y.errors.join("\n"));
+    first.close(); w.close();
+  });
+
+  /* ---- T29: unlocked stage checkpoints, playable branch replays, no ranked farming ---- */
+  check("POST-GAME: archive replays branch from unlocked sectors without altering career records", () => {
+    const x = boot({ w: 1280, h: 720 }), w = x.window, BP = w.__BP;
+    BP.Profile.bestSector = 4; BP.Profile.save();
+    const before = { runs: BP.Profile.runs, wins: BP.Profile.wins, salvage: BP.Profile.salvage, ngPlus: BP.Profile.ngPlusTier };
+    assert(BP.api.openArchive(), "sector archive failed to open");
+    assert(BP.G.mode === "archive", "archive mode state was not entered");
+    assert(w.document.querySelectorAll("#archive-sectors .archive-stage:not(:disabled)").length === 4, "archive unlocks the wrong checkpoint count");
+    assert(w.document.querySelectorAll("#archive-sectors .archive-stage:disabled").length === 6, "future checkpoints should remain locked");
+    assert(w.document.querySelectorAll("#archive-branches .archive-branch").length === 5, "archive did not offer all five branch doctrines");
+    const run = BP.api.startArchiveRun(4, "hp");
+    assert(run && run.archive && run.sector === 4, "archive did not start the selected checkpoint");
+    assert(run.choiceHistory[0].branchId === "survival" && run.player.modules.includes("hp"), "archive branch starter was not applied and recorded");
+    BP.api.victory(run);
+    assert(BP.G.mode === "win" && BP.Profile.endings.survival, "archive victory did not reveal its route ending");
+    assert(BP.Profile.runs === before.runs && BP.Profile.wins === before.wins, "archive replay altered career run counters");
+    assert(BP.Profile.salvage === before.salvage && BP.Profile.ngPlusTier === before.ngPlus, "archive replay banked ranked currency or unlocked NG+");
+    assert(BP.Profile.lastRun.archive === true, "archive result was not saved in the replay dossier");
+    assert(x.errors.length === 0, "archive errors:\n" + x.errors.join("\n"));
+    w.close();
+  });
+
+  /* ---- T30: all-route reward requires the five doctrinal endings, not balanced ---- */
+  check("POST-GAME: Five Futures unlock requires all five distinct route endings", () => {
+    const x = boot({ w: 1280, h: 720 }), w = x.window, BP = w.__BP;
+    const profile = BP.Profile;
+    profile.endings = Object.create(null);
+    profile.achievements = Object.create(null);
+    profile.salvage = 0; profile.totalSalvage = 0; profile.save();
+    const routeIds = BP.BRANCH_LIST.map(branch => branch.id);
+    for (const id of routeIds.slice(0, 4)) profile.recordEnding(id);
+    profile.recordEnding("balanced");
+    assert(!profile.has("allroutes"), "balanced ending incorrectly counted toward the five-route achievement");
+    profile.recordEnding(routeIds[4]);
+    assert(profile.has("allroutes"), "all five distinct route endings did not unlock Five Futures");
+    assert(profile.salvage === 320, "Five Futures did not grant its one-time salvage reward");
+    assert(x.errors.length === 0, "ending archive errors:\n" + x.errors.join("\n"));
+    w.close();
+  });
+
+  /* ---- T31: existing career profiles inherit newly introduced meta unlocks ---- */
+  check("POST-GAME: veteran profiles migrate previously earned palettes and New Game+", () => {
+    const oldProfile = {
+      bestSector: 5, wins: 1, salvage: 700, totalSalvage: 1400, totalKills: 320,
+      runs: 4, bestScore: 42000, bestRank: "B", bestCombo: 12, playTime: 900,
+      upgrades: {}, achievements: { boss: Date.now() }, prefs: { startWeapon: "pulse" }
+    };
+    const x = boot({ w: 1280, h: 720, storage: {
+      "blackout-protocol-profile-v2": JSON.stringify(oldProfile)
+    }});
+    const w = x.window, BP = w.__BP;
+    assert(BP.Profile.ngPlusTier === 1, "existing career victory did not unlock the first NG+ tier");
+    assert(BP.Profile.cosmetics.ember && BP.Profile.cosmetics.verdant && BP.Profile.cosmetics.violet && BP.Profile.cosmetics.solar,
+      "existing sector, boss, or victory records did not grant their matching palettes");
+    assert(w.document.getElementById("btn-menu-ngplus").classList.contains("hidden") === false, "migrated NG+ button is hidden");
+    assert(x.errors.length === 0, "veteran profile migration errors:\n" + x.errors.join("\n"));
     w.close();
   });
 

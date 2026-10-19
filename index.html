@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="BLACKOUT PROTOCOL — a light-phobic twin-stick survival shooter. Your lamp is your lifeline. Your gunfire is a dinner bell.">
-<title>BLACKOUT PROTOCOL</title>
+<meta name="description" content="BLACKOUT PROTOCOL — a self-contained twin-stick survival shooter with color-coded branches, five endings, New Game+, and a replayable sector archive.">
+<title>BLACKOUT PROTOCOL — The Branching Descent</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#02040a}
@@ -209,6 +209,105 @@ kbd{
   .ctrls{grid-template-columns:1fr 1fr}
   .card{flex:1 1 100%;max-width:none}
 }
+
+/* ---------- refinement: crisp, branch-coded progression and meta screens ---------- */
+:root{
+  color-scheme:dark;
+  --theme-accent:#59d6ff;
+  --theme-accent-rgb:89,214,255;
+  --theme-glow:rgba(89,214,255,.24);
+  --theme-contrast:#f3fbff;
+}
+body{font-family:Inter,"Aptos","Segoe UI",ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
+.eyebrow,.records,.ctrl small,.tiny,.stat .l,.prow,.hangar-top,.htab{font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace}
+h1.title,.mtitle,h2.sub{font-family:Inter,"Aptos Display","Segoe UI",ui-sans-serif,system-ui,sans-serif;letter-spacing:.025em}
+.screen{animation:screen-arrive .26s cubic-bezier(.2,.75,.2,1) both}
+@keyframes screen-arrive{from{opacity:0;transform:translateY(8px) scale(.995)}to{opacity:1;transform:none}}
+.btn{border-radius:8px;border-color:rgba(var(--theme-accent-rgb),.36);box-shadow:0 0 0 1px rgba(0,0,0,.56) inset,0 9px 24px rgba(0,0,0,.34);font-weight:700}
+.btn:hover,.btn:focus-visible{box-shadow:0 0 0 1px rgba(0,0,0,.5) inset,0 0 30px var(--theme-glow),0 10px 25px rgba(0,0,0,.38)}
+.btn.primary{border-color:color-mix(in srgb,var(--theme-accent) 62%,white);box-shadow:0 0 0 1px rgba(0,0,0,.5) inset,0 0 26px var(--theme-glow),0 7px 18px rgba(0,0,0,.36)}
+.btn.primary:hover{box-shadow:0 0 0 1px rgba(0,0,0,.5) inset,0 0 38px var(--theme-glow),0 9px 23px rgba(0,0,0,.4)}
+.hangar-tabs{flex-wrap:wrap;justify-content:center}
+.card{border-radius:12px;background:linear-gradient(145deg,rgba(19,37,58,.96),rgba(5,12,24,.98));backdrop-filter:blur(8px);min-height:218px}
+.card:before{width:4px}
+.card:hover,.card:focus-visible{transform:translateY(-6px) scale(1.012)}
+.card .nm{font-family:Inter,"Segoe UI",ui-sans-serif,system-ui,sans-serif;letter-spacing:.04em}
+.card .ds{font-family:Inter,"Segoe UI",ui-sans-serif,system-ui,sans-serif;color:#c0d4e7}
+.card .branch-label{display:flex;align-items:center;gap:7px;margin:12px 0 2px;color:var(--accent);font:800 10px/1.2 ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase}
+.card .branch-label .branch-glyph{display:grid;place-items:center;width:23px;height:23px;border:1px solid color-mix(in srgb,var(--accent) 65%,transparent);border-radius:7px;background:color-mix(in srgb,var(--accent) 15%,transparent);font-size:13px}
+.card .tg{font-weight:800;opacity:1}
+.card .num{display:grid;place-items:center;right:13px;top:12px;width:25px;height:25px;border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);border-radius:50%;color:#eaf6ff;background:color-mix(in srgb,var(--accent) 16%,#06101d);font-weight:800}
+.route-meter{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;margin:0 auto 12px;min-height:25px}
+.route-meter .route-chip{padding:5px 9px;border:1px solid color-mix(in srgb,var(--branch-color) 46%,transparent);border-radius:999px;background:color-mix(in srgb,var(--branch-color) 11%,#07101a);color:var(--branch-color);font:700 9px/1.2 ui-monospace,monospace;letter-spacing:.11em;text-transform:uppercase}
+.route-meter .route-empty{color:#7793aa;font:600 10px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase}
+
+/* Archive: readable stage map, then five distinctly colored launch branches. */
+.archive-shell{width:min(1120px,96vw);display:grid;grid-template-columns:minmax(220px,.82fr) minmax(360px,1.6fr);gap:clamp(12px,2.2vmin,24px);text-align:left}
+.archive-panel{padding:clamp(12px,2vmin,20px);border:1px solid rgba(124,181,224,.2);border-radius:14px;background:linear-gradient(150deg,rgba(13,30,48,.94),rgba(4,10,19,.96));box-shadow:0 18px 42px rgba(0,0,0,.35)}
+.archive-heading{margin:0 0 10px;color:#eaf6ff;font:800 12px ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase}
+.archive-caption{margin:0 0 12px;color:#8eaec8;font:500 11px/1.55 Inter,"Segoe UI",sans-serif}
+.archive-sectors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:min(42vh,410px);overflow:auto;padding:2px}
+.archive-stage{--stage-accent:#59d6ff;min-height:70px;padding:8px;text-align:left;color:#cfe6ff;background:linear-gradient(145deg,rgba(19,39,61,.9),rgba(6,14,25,.9));border:1px solid rgba(110,170,210,.2);border-radius:9px;cursor:pointer;transition:transform .14s ease,border-color .14s ease,background .14s ease;}
+.archive-stage:hover:not(:disabled),.archive-stage:focus-visible{transform:translateY(-2px);border-color:var(--stage-accent);outline:none;box-shadow:0 0 18px color-mix(in srgb,var(--stage-accent) 24%,transparent)}
+.archive-stage.selected{border-color:var(--stage-accent);background:linear-gradient(145deg,color-mix(in srgb,var(--stage-accent) 21%,#13253a),rgba(5,12,22,.96));box-shadow:0 0 18px color-mix(in srgb,var(--stage-accent) 20%,transparent)}
+.archive-stage:disabled{opacity:.35;cursor:not-allowed;filter:saturate(.45)}
+.archive-stage .stage-number{display:block;color:var(--stage-accent);font:800 10px ui-monospace,monospace;letter-spacing:.16em}
+.archive-stage .stage-name{display:block;margin-top:5px;font:700 10px/1.25 Inter,"Segoe UI",sans-serif;letter-spacing:.015em}
+.archive-stage .stage-lock{display:block;margin-top:5px;color:#7891a8;font:700 8px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}
+.archive-current{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:0 0 12px;padding:10px 12px;border-left:3px solid var(--stage-accent,#59d6ff);border-radius:0 8px 8px 0;background:rgba(11,25,41,.9)}
+.archive-current strong{font:800 12px ui-monospace,monospace;letter-spacing:.12em;color:#eff8ff}
+.archive-current span{font:700 9px ui-monospace,monospace;letter-spacing:.1em;color:var(--stage-accent,#59d6ff)}
+.archive-branches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.archive-branch{--branch-color:#59d6ff;position:relative;min-height:126px;padding:12px;text-align:left;color:#eaf6ff;background:linear-gradient(150deg,color-mix(in srgb,var(--branch-color) 13%,#101d30),rgba(5,11,20,.96));border:1px solid color-mix(in srgb,var(--branch-color) 35%,rgba(80,120,160,.25));border-radius:10px;cursor:pointer;overflow:hidden;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.archive-branch:last-child{grid-column:1/-1}
+.archive-branch:hover,.archive-branch:focus-visible{transform:translateY(-3px);border-color:var(--branch-color);box-shadow:0 0 24px color-mix(in srgb,var(--branch-color) 25%,transparent);outline:none}
+.archive-branch .branch-top{display:flex;align-items:center;gap:8px;color:var(--branch-color);font:800 10px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase}
+.archive-branch .branch-icon{display:grid;place-items:center;width:27px;height:27px;border-radius:8px;background:color-mix(in srgb,var(--branch-color) 18%,#07101b);font-size:15px}
+.archive-branch .branch-module{display:block;margin:10px 0 4px;font:800 12px Inter,"Segoe UI",sans-serif}
+.archive-branch .branch-copy{display:block;color:#afc4d7;font:500 10px/1.5 Inter,"Segoe UI",sans-serif}
+.archive-branch .branch-cta{display:block;margin-top:10px;color:var(--branch-color);font:800 8px ui-monospace,monospace;letter-spacing:.15em;text-transform:uppercase}
+.archive-last{width:min(1120px,96vw);margin:12px auto 0;padding:10px 13px;border:1px solid rgba(120,177,217,.18);border-radius:10px;background:rgba(4,12,22,.72);color:#8eaec8;text-align:left;font:500 10px/1.6 Inter,"Segoe UI",sans-serif}
+.archive-last b{color:#eaf6ff}
+.archive-footer{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:12px}
+.archive-footer .tiny{margin:0;letter-spacing:.1em}
+
+/* End-of-run dossier: chosen branches, narrative outcome, and newly indexed citations. */
+.postgame-review{display:grid;grid-template-columns:1.3fr 1fr;gap:10px;width:min(940px,96vw);margin:12px 0}
+.review-card{min-width:0;padding:12px;text-align:left;border:1px solid rgba(119,183,224,.2);border-radius:10px;background:linear-gradient(145deg,rgba(13,28,45,.95),rgba(4,10,19,.96))}
+.review-title{margin:0 0 9px;color:#85a9c5;font:800 9px ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase}
+.choice-history{display:flex;gap:6px;flex-wrap:wrap;max-height:118px;overflow:auto}
+.choice-history .history-chip{--branch-color:#59d6ff;display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid color-mix(in srgb,var(--branch-color) 42%,transparent);border-radius:8px;background:color-mix(in srgb,var(--branch-color) 10%,#06101b);color:#e5f3ff;font:700 9px/1.25 ui-monospace,monospace}
+.history-chip .history-sector{color:var(--branch-color);font-weight:900}
+.history-chip .history-glyph{color:var(--branch-color);font-size:12px}
+.review-empty,.ending-copy{margin:0;color:#a8bfd3;font:500 10px/1.55 Inter,"Segoe UI",sans-serif}
+.ending-copy{margin-top:9px;padding-top:9px;border-top:1px solid rgba(120,175,210,.15)}
+.ending-copy strong{color:var(--ending-color,#ffd36a);font:800 10px ui-monospace,monospace;letter-spacing:.1em}
+.citation-list{display:flex;gap:6px;flex-wrap:wrap;align-content:flex-start;max-height:120px;overflow:auto}
+.citation-pill{padding:6px 8px;border:1px solid rgba(125,255,184,.32);border-radius:999px;background:rgba(24,80,59,.24);color:#adffd0;font:700 9px ui-monospace,monospace}
+.citation-pill.new{background:rgba(24,120,77,.32);box-shadow:0 0 14px rgba(76,255,164,.12)}
+.postgame-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;width:min(960px,96vw)}
+.postgame-actions .btn{margin:3px;padding-inline:clamp(12px,2.3vmin,24px);font-size:clamp(9px,1.35vmin,12px)}
+
+/* Cosmetic palette previews and selection controls. */
+.theme-swatch{width:42px;height:42px;border:1px solid color-mix(in srgb,var(--theme-swatch) 65%,white);border-radius:12px;background:radial-gradient(circle at 35% 30%,white 0 4%,var(--theme-swatch) 15% 48%,#07111d 75%);box-shadow:0 0 20px color-mix(in srgb,var(--theme-swatch) 36%,transparent)}
+.theme-unlocked{color:#aaffd0!important}.theme-locked{opacity:.55;filter:saturate(.45)}
+.theme-select.active{border-color:var(--theme-accent);color:#fff;background:color-mix(in srgb,var(--theme-accent) 18%,#06101b)}
+@media(max-width:760px){
+  .archive-shell{grid-template-columns:1fr}
+  .archive-sectors{grid-template-columns:repeat(2,minmax(0,1fr));max-height:230px}
+  .archive-branches{grid-template-columns:1fr 1fr}
+  .postgame-review{grid-template-columns:1fr}
+  .review-card{padding:10px}
+}
+@media(max-width:480px){
+  .archive-branches{grid-template-columns:1fr}
+  .archive-branch:last-child{grid-column:auto}
+  .archive-stage{min-height:65px}
+  .postgame-actions .btn{flex:1 1 42%}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
 </style>
 </head>
 <body>
@@ -251,6 +350,8 @@ kbd{
       <div class="ctrl"><kbd>F</kbd><small>cycle weapon</small></div>
       <div class="ctrl"><kbd>ESC</kbd><small>pause</small></div>
       <div class="ctrl"><kbd>M</kbd><small>mute</small></div>
+      <div class="ctrl"><kbd>A</kbd><small>sector archive</small></div>
+      <div class="ctrl"><kbd>N</kbd><small>new game+ if unlocked</small></div>
     </div>
     <div class="records">
       <div>Best Score <b id="rec-score">0</b></div>
@@ -263,6 +364,8 @@ kbd{
     <hr class="rule">
     <div>
       <button class="btn primary" id="btn-start">Descend <span class="k">ENTER</span></button>
+      <button class="btn ghost hidden" id="btn-menu-ngplus">New Game+ <span data-ngplus-label>1</span> <span class="k">N</span></button>
+      <button class="btn ghost" id="btn-archive">Sector Archive <span class="k">A</span></button>
       <button class="btn ghost" id="btn-hangar">HADAL Armory</button>
       <button class="btn ghost" id="btn-how">Field Manual</button>
     </div>
@@ -277,11 +380,34 @@ kbd{
     <div class="hangar-tabs">
       <button class="htab active" data-hangar-tab="arsenal">Permanent upgrades</button>
       <button class="htab" data-hangar-tab="achievements">Achievements</button>
+      <button class="htab" data-hangar-tab="themes">Visual themes</button>
       <button class="htab" data-hangar-tab="records">Career / options</button>
     </div>
     <div id="hangar-content"></div>
     <p class="hangar-note" id="hangar-note">Salvage earned from kills and first-time achievements is banked when a run ends. Arsenal upgrades persist between descents.</p>
     <button class="btn ghost" id="btn-hangar-back">Return to station <span class="k">ESC</span></button>
+  </div>
+
+  <!-- ============ SECTOR / BRANCH ARCHIVE ============ -->
+  <div id="screen-archive" class="screen hidden">
+    <p class="eyebrow">HADAL-9 · SIMULATION ARCHIVE · NON-RANKED REPLAY</p>
+    <h1 class="title" style="font-size:clamp(25px,5.6vmin,58px)">Branch <span class="amber">Replay</span></h1>
+    <p class="archive-caption" style="text-align:center;max-width:76ch">Re-enter a sector you have reached and test a different upgrade doctrine. Archive sorties reveal alternate endings without changing ranked records or banking run salvage; first-time citations still count.</p>
+    <div class="archive-shell">
+      <section class="archive-panel" aria-label="Choose a sector checkpoint">
+        <h2 class="archive-heading">01 · Select checkpoint</h2>
+        <p class="archive-caption">Only sectors reached in a career run are unlocked.</p>
+        <div class="archive-sectors" id="archive-sectors"></div>
+      </section>
+      <section class="archive-panel" aria-label="Choose a route branch">
+        <h2 class="archive-heading">02 · Choose a branch</h2>
+        <p class="archive-caption" id="archive-brief">A branch module is installed before the first wave.</p>
+        <div class="archive-current" id="archive-current"><strong>SECTOR 01</strong><span>CHECKPOINT</span></div>
+        <div class="archive-branches" id="archive-branches"></div>
+      </section>
+    </div>
+    <div class="archive-last" id="archive-last-route" aria-live="polite"></div>
+    <div class="archive-footer"><span class="tiny" id="archive-status">Choose an open sector, then launch any branch.</span><button class="btn ghost" id="btn-archive-back">Back <span class="k">ESC</span></button></div>
   </div>
 
   <!-- ============ FIELD MANUAL ============ -->
@@ -351,23 +477,31 @@ kbd{
 
   <!-- ============ MODULE SELECT ============ -->
   <div id="screen-modules" class="screen hidden">
-    <p class="eyebrow" id="mod-eyebrow">SALVAGE FABRICATOR — SECTOR 1 CLEARED</p>
-    <h1 class="mtitle">Install One Module</h1>
-    <p class="mhint">Keys <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> or click</p>
-    <div class="cards" id="mod-cards"></div>
+    <p class="eyebrow" id="mod-eyebrow">SECTOR CLEARED · CHOOSE YOUR NEXT BRANCH</p>
+    <h1 class="mtitle">Choose Your Branch</h1>
+    <p class="mhint">One module · Three distinct doctrines · <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> or tap</p>
+    <div class="route-meter" id="module-route" aria-label="Choices made this run"></div>
+    <div class="cards" id="mod-cards" role="group" aria-label="Choose one upgrade branch"></div>
     <p class="tiny" id="mod-stats">—</p>
   </div>
 
   <!-- ============ GAME OVER ============ -->
   <div id="screen-over" class="screen hidden">
-    <p class="eyebrow">SUIT TELEMETRY LOST</p>
+    <p class="eyebrow">SUIT TELEMETRY LOST · RUN REPORT</p>
     <h1 class="title" style="color:#ffd9cc;text-shadow:0 0 2px #fff,0 0 26px rgba(255,90,50,.6),0 0 70px rgba(200,40,10,.4)">Signal <span class="amber" style="color:#ff8a5c">Lost</span></h1>
     <p class="deathline" id="death-line">Torn apart in the dark.</p>
     <div class="rank" id="over-rank">D</div>
     <div id="over-best" class="hidden"><span class="newbest">New personal best</span></div>
     <div class="stats" id="over-stats"></div>
-    <div>
+    <div class="postgame-review">
+      <section class="review-card"><h2 class="review-title">Your route · <span id="over-route-count">0 decisions</span></h2><div class="choice-history" id="over-choices"></div><p class="ending-copy" id="over-ending"></p></section>
+      <section class="review-card"><h2 class="review-title">Citations · newly indexed</h2><div class="citation-list" id="over-citations"></div></section>
+    </div>
+    <div class="postgame-actions">
       <button class="btn primary" id="btn-retry">Redeploy <span class="k">ENTER</span></button>
+      <button class="btn ghost hidden" id="btn-over-ngplus">New Game+ <span data-ngplus-label>1</span></button>
+      <button class="btn ghost" id="btn-over-archive">Branch replay</button>
+      <button class="btn ghost" id="btn-over-hangar">Armory &amp; themes</button>
       <button class="btn ghost" id="btn-menu">Surface</button>
     </div>
   </div>
@@ -376,12 +510,19 @@ kbd{
   <div id="screen-win" class="screen hidden">
     <p class="eyebrow">HADAL-9 CORE REACHED — DAYLIGHT BEACON ONLINE</p>
     <h1 class="title" style="color:#eafff4;text-shadow:0 0 2px #fff,0 0 26px rgba(90,255,180,.55),0 0 80px rgba(30,200,140,.4)">Surface <span class="amber" style="color:#8dffc0">Break</span></h1>
-    <p class="blurb">Ten sectors. Every nest burned out. The lift doors open onto actual sunlight for the first time in eleven days — and something in the cargo bay is still scratching.</p>
+    <p class="blurb" id="win-ending-blurb">The lift opens onto daylight. What happens next depends on the doctrine you built on the way down.</p>
     <div class="rank" id="win-rank">S</div>
     <div id="win-best" class="hidden"><span class="newbest">New personal best</span></div>
     <div class="stats" id="win-stats"></div>
-    <div>
+    <div class="postgame-review">
+      <section class="review-card"><h2 class="review-title">Your route · <span id="win-route-count">0 decisions</span></h2><div class="choice-history" id="win-choices"></div><p class="ending-copy" id="win-ending"></p></section>
+      <section class="review-card"><h2 class="review-title">Citations · newly indexed</h2><div class="citation-list" id="win-citations"></div></section>
+    </div>
+    <div class="postgame-actions">
       <button class="btn primary" id="btn-again">Descend Again <span class="k">ENTER</span></button>
+      <button class="btn ghost hidden" id="btn-win-ngplus">New Game+ <span data-ngplus-label>1</span></button>
+      <button class="btn ghost" id="btn-win-archive">Branch replay</button>
+      <button class="btn ghost" id="btn-win-hangar">Armory &amp; themes</button>
       <button class="btn ghost" id="btn-win-menu">Surface</button>
     </div>
   </div>
@@ -725,6 +866,8 @@ const PROFILE_KEY = "blackout-protocol-profile-v2";
 const Profile = {
   bestScore: 0, bestSector: 0, totalKills: 0, runs: 0, bestRank: "",
   salvage: 100, totalSalvage: 100, wins: 0, bestCombo: 0, playTime: 0,
+  ngPlusTier: 0, cosmetics: { ice: true }, selectedTheme: "ice",
+  endings: Object.create(null), lastRun: null,
   upgrades: Object.create(null),
   achievements: Object.create(null),
   prefs: { damageNumbers: true, screenShake: 1, music: true, startWeapon: "pulse" },
@@ -745,14 +888,26 @@ const Profile = {
         this.wins = Number(o.wins) || 0;
         this.bestCombo = Number(o.bestCombo) || 0;
         this.playTime = Number(o.playTime) || 0;
+        this.ngPlusTier = clamp(Math.floor(Number(o.ngPlusTier) || 0), 0, 99);
         this.upgrades = (o.upgrades && typeof o.upgrades === "object") ? o.upgrades : Object.create(null);
         this.achievements = (o.achievements && typeof o.achievements === "object") ? o.achievements : Object.create(null);
+        this.cosmetics = Object.create(null);
+        if (o.cosmetics && typeof o.cosmetics === "object") {
+          for (const id of Object.keys(VISUAL_THEMES)) if (o.cosmetics[id]) this.cosmetics[id] = true;
+        }
+        this.cosmetics.ice = true;
+        this.endings = Object.create(null);
+        if (o.endings && typeof o.endings === "object") {
+          for (const id of Object.keys(ENDINGS)) if (o.endings[id]) this.endings[id] = Number(o.endings[id]) || Date.now();
+        }
+        this.lastRun = normalizeStoredRun(o.lastRun);
         if (o.prefs) Object.assign(this.prefs, o.prefs);
         if (!["pulse", "scatter", "lance"].includes(this.prefs.startWeapon)) this.prefs.startWeapon = "pulse";
         this.prefs.damageNumbers = this.prefs.damageNumbers !== false;
         this.prefs.music = this.prefs.music !== false;
         const shakeValue = Number(this.prefs.screenShake);
         this.prefs.screenShake = Number.isFinite(shakeValue) ? clamp(shakeValue, 0, 1) : 1;
+        this.selectedTheme = VISUAL_THEMES[o.selectedTheme] && this.cosmetics[o.selectedTheme] ? o.selectedTheme : "ice";
       } else {
         // migrate a v1 profile if one exists
         const legacy = localStorage.getItem(RECORD_KEY);
@@ -779,7 +934,9 @@ const Profile = {
         bestScore: this.bestScore, bestSector: this.bestSector, totalKills: this.totalKills,
         runs: this.runs, bestRank: this.bestRank, salvage: this.salvage,
         totalSalvage: this.totalSalvage, wins: this.wins, bestCombo: this.bestCombo,
-        playTime: this.playTime, upgrades: this.upgrades, achievements: this.achievements,
+        playTime: this.playTime, ngPlusTier: this.ngPlusTier,
+        cosmetics: this.cosmetics, selectedTheme: this.selectedTheme, endings: this.endings,
+        lastRun: this.lastRun, upgrades: this.upgrades, achievements: this.achievements,
         prefs: this.prefs
       }));
       // Keep the original five-field record key in sync for legacy clients/tests.
@@ -817,12 +974,28 @@ const Profile = {
     this.save();
     return true;
   },
+  unlockTheme(themeId) {
+    if (!VISUAL_THEMES[themeId] || this.cosmetics[themeId]) return false;
+    this.cosmetics[themeId] = true;
+    this.save();
+    return true;
+  },
+  recordEnding(endingId) {
+    if (!ENDINGS[endingId] || this.endings[endingId]) return false;
+    this.endings[endingId] = Date.now();
+    const discoveredRoutes = Object.keys(this.endings).filter(id => id !== "balanced").length;
+    if (discoveredRoutes >= BRANCH_LIST.length) this.unlock("allroutes");
+    this.save();
+    return true;
+  },
   reset() {
     this.bestScore = 0; this.bestSector = 0; this.totalKills = 0; this.runs = 0;
     this.bestRank = ""; this.salvage = 0; this.totalSalvage = 0; this.wins = 0;
-    this.bestCombo = 0; this.playTime = 0;
+    this.bestCombo = 0; this.playTime = 0; this.ngPlusTier = 0;
     this.upgrades = Object.create(null);
     this.achievements = Object.create(null);
+    this.cosmetics = { ice: true }; this.selectedTheme = "ice";
+    this.endings = Object.create(null); this.lastRun = null;
     this.save();
   },
   submit(run) {
@@ -908,7 +1081,8 @@ const ACHIEVEMENTS = [
   { id: "hazard",   icon: "⚠", name: "Environmental",     reward: 50,  desc: "Let a station hazard kill 15 hostiles." },
   { id: "mods",     icon: "◈", name: "Overclocked",       reward: 130, desc: "Install 8 modules in one run." },
   { id: "rich",     icon: "¤", name: "Salvage Baron",     reward: 160, desc: "Bank 2,000 total salvage." },
-  { id: "revive",   icon: "❤", name: "Back From It",      reward: 90,  desc: "Survive a lethal hit with the defibrillator." }
+  { id: "revive",   icon: "❤", name: "Back From It",      reward: 90,  desc: "Survive a lethal hit with the defibrillator." },
+  { id: "allroutes",icon: "✧", name: "Five Futures",      reward: 320, desc: "Discover all five branch endings." }
 ];
 
 /* ------------------------------------------------------------------ *
@@ -1036,6 +1210,15 @@ const THEMES = {
 const SECTOR_THEME = ["", "spine", "bloom", "coolant", "vault", "nest",
                       "spine", "coolant", "bloom", "vault", "nest"];
 
+/* Earned palettes recolor the suit, lamp, and interface; all are procedural. */
+const VISUAL_THEMES = {
+  ice:     { id: "ice",     name: "Cryo Glass",  accent: "#59d6ff", rgb: "89,214,255", suit: "#3d5f80", highlight: "#bfe9ff", unlock: "Available" },
+  ember:   { id: "ember",   name: "Reactor Ember",accent: "#ff875e", rgb: "255,135,94", suit: "#7c493a", highlight: "#ffe0a6", unlock: "Reach sector 3" },
+  verdant: { id: "verdant", name: "Spore Bloom",  accent: "#62eda8", rgb: "98,237,168", suit: "#315d4b", highlight: "#c8ffe0", unlock: "Reach sector 5" },
+  violet:  { id: "violet",  name: "Deep Signal",  accent: "#bd91ff", rgb: "189,145,255", suit: "#51416f", highlight: "#edddff", unlock: "Defeat the Warden" },
+  solar:   { id: "solar",   name: "Daybreak",     accent: "#ffd36a", rgb: "255,211,106", suit: "#6b5730", highlight: "#fff0bd", unlock: "Complete a career run" }
+};
+
 const HAZARDS = {
   spore: {
     id: "spore", name: "SPORE POOL", r: 78, dps: 11, color: "#9dff8a",
@@ -1153,6 +1336,71 @@ const MODULES = [
     desc: "Killing anything briefly slows time. Chain kills to surf the bullet-time.",
     apply: p => { p.slowmo = true; } }
 ];
+
+/* Drafts are five recognizable doctrines. Each offers a distinct gameplay
+   branch, palette, icon, and eventual epilogue. */
+const CHOICE_BRANCHES = {
+  Offensive: { id: "assault", name: "ASSAULT", icon: "⚔", color: "#ff6470", pitch: "Hit harder. End the fight fast." },
+  Sustain:   { id: "survival", name: "SURVIVAL", icon: "✚", color: "#48e3a0", pitch: "Stay standing when the deck turns hostile." },
+  Utility:   { id: "engineering", name: "ENGINEERING", icon: "⌘", color: "#43d7ff", pitch: "Make the station work for you." },
+  Mobility:  { id: "ghost", name: "GHOST", icon: "➤", color: "#b58bff", pitch: "Keep moving. Choose when to engage." },
+  Score:     { id: "signal", name: "SIGNAL", icon: "✦", color: "#ffd166", pitch: "Turn clean execution into a bigger payout." }
+};
+const BRANCH_LIST = Object.keys(CHOICE_BRANCHES).map(tag => CHOICE_BRANCHES[tag]);
+const ARCHIVE_BRANCH_MODULES = { assault: "dmg", survival: "hp", engineering: "lamp", ghost: "dash", signal: "mult" };
+const CHOICE_COPY = {
+  dmg: "Deal 22% more damage with every weapon.",
+  rof: "Fire 18% faster. Keep pressure on the nest.",
+  mag: "Carry 45% more rounds; reload 18% faster.",
+  ric: "Rounds bounce once toward a nearby target.",
+  frag: "Impacts burst for area damage around the target.",
+  vamp: "Restore a little integrity from every hit you land.",
+  lamp: "A longer, wider beam that burns 45% harder.",
+  flare: "Flares hit harder and return 40% sooner.",
+  hp: "Gain 30 maximum integrity and repair fully now.",
+  spd: "Move faster and dash farther.",
+  dash: "Dash costs less, returns sooner, and protects longer.",
+  boom: "Every hostile death erupts in a damaging shockwave.",
+  mult: "Earn 25% more score; keep combos alive longer.",
+  drone: "A sentry orbits you and fires at the nearest threat.",
+  mag2: "Pull pickups from farther away; find them more often.",
+  tesla: "Every tenth shot chains an electric arc through enemies.",
+  energy: "Gain 40 maximum energy and regenerate it faster.",
+  regen: "Heal slowly after five seconds without taking damage.",
+  slow: "Kills briefly slow time. Keep the chain going."
+};
+const ENDINGS = {
+  balanced: { id: "balanced", title: "SURFACE BREAK", name: "Balanced Protocol", color: "#d9efff",
+    text: "You combine containment, a live rescue beacon, and an intact data bundle. The station is quiet at last; the surface can decide what comes next." },
+  assault: { id: "assault", title: "PURGE PROTOCOL", name: "The Burn Route", color: CHOICE_BRANCHES.Offensive.color,
+    text: "You route the exposed core through the sterilization grid. HADAL-9 burns clean; the surface receives one clear message: threat contained." },
+  survival: { id: "survival", title: "LIFELINE PROTOCOL", name: "The Rescue Route", color: CHOICE_BRANCHES.Sustain.color,
+    text: "You divert the core to life support. Cryopods wake one by one, and the rescue beacon finally answers with another human voice." },
+  engineering: { id: "engineering", title: "OPEN CHANNEL", name: "The Truth Route", color: CHOICE_BRANCHES.Utility.color,
+    text: "You splice the core into the uplink. Every sealed lab log reaches the surface; nobody can bury what happened here." },
+  ghost: { id: "ghost", title: "GHOST CURRENT", name: "The Quiet Route", color: CHOICE_BRANCHES.Mobility.color,
+    text: "You cut the grid and leave the beacon dark. HADAL-9 slips off the map—along with the thing that followed you." },
+  signal: { id: "signal", title: "ECHO ARCHIVE", name: "The Signal Route", color: CHOICE_BRANCHES.Score.color,
+    text: "You hide the station's research inside a routine relay burst. The truth survives in millions of ordinary transmissions." }
+};
+function branchForModule(module) { return module && CHOICE_BRANCHES[module.tag] || null; }
+function recordChoice(run, module, sector, source) {
+  const branch = branchForModule(module);
+  if (!run || !module || !branch) return null;
+  const choice = { sector: clamp(Math.floor(sector || run.sector), 1, CFG.MAX_SECTOR), moduleId: module.id, branchId: branch.id, source: source || "draft" };
+  run.choiceHistory.push(choice);
+  return choice;
+}
+function resolveEnding(run) {
+  const counts = Object.create(null);
+  for (const choice of run.choiceHistory || []) counts[choice.branchId] = (counts[choice.branchId] || 0) + 1;
+  const values = Object.keys(counts);
+  if (!values.length) return ENDINGS.balanced;
+  const best = Math.max(...values.map(id => counts[id]));
+  const leaders = values.filter(id => counts[id] === best);
+  if (leaders.length !== 1) return ENDINGS.balanced;
+  return ENDINGS[leaders[0]] || ENDINGS.balanced;
+}
 
 /* ------------------------------------------------------------------ *
  * 6. INPUT
@@ -1300,7 +1548,7 @@ for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) altButt
  * 7. GAME STATE
  * ------------------------------------------------------------------ */
 const G = {
-  mode: "menu",           // menu | how | playing | paused | modules | over | win
+  mode: "menu",           // menu | how | hangar | archive | playing | paused | modules | over | win
   t: 0,                   // global seconds (always advances, for menu FX)
   run: null,
   flash: 0,               // white flash 0..1
@@ -1352,6 +1600,8 @@ function newRun(seed) {
   return {
     seed: seed >>> 0,
     sector: 1, wave: 1,
+    ngPlusTier: 0, archive: null, choiceHistory: [], ending: null,
+    citationsAtStart: Object.keys(Profile.achievements),
     score: 0, kills: 0, shots: 0, hits: 0,
     combo: 0, comboT: 0, maxCombo: 0, comboPop: 0,
     time: 0, damageTaken: 0, coresGot: 0, coresNeed: 0,
@@ -1534,19 +1784,22 @@ function overlapsAny(list, x, y, pad) {
 /* ------------------------------------------------------------------ *
  * 9. WAVES
  * ------------------------------------------------------------------ */
-function waveComposition(sector, wave) {
+function waveComposition(sector, wave, ngPlusTier) {
   const isLast = wave >= CFG.WAVES_PER_SECTOR;
-  // Sector 1 wave 1 is a handshake: a handful of Lurkers, no ambush pressure.
-  if (sector === 1 && wave === 1) return { count: 5, pool: ["lurker"], isLast: false };
+  const tier = clamp(Math.floor(Number(ngPlusTier) || 0), 0, 99);
+  const plusCount = count => Math.round(count * (1 + Math.min(0.8, tier * 0.08)));
+  // Sector 1 wave 1 is a handshake in a standard run; NG+ keeps the tutorial
+  // readable while adding a modest number of threats.
+  if (sector === 1 && wave === 1) return { count: plusCount(5), pool: ["lurker"], isLast: false };
   const pool = enemyPool(sector);
   const base = 5 + Math.floor(sector * 1.5) + wave * 1.8;
   let count = Math.round(base * (isLast ? 1.3 : 1));
-  count = clamp(count, 4, 46);
+  count = clamp(plusCount(count), 4, 54);
   return { count, pool, isLast };
 }
 
 function startWave(run) {
-  const c = waveComposition(run.sector, run.wave);
+  const c = waveComposition(run.sector, run.wave, run.ngPlusTier);
   const isBossWave = run.sector === CFG.MAX_SECTOR && run.wave >= CFG.WAVES_PER_SECTOR;
   run.waveBudget = isBossWave ? 0 : Math.round(c.count *
     ((run.mod && run.mod.waveMul && !(run.sector === 1 && run.wave === 1)) ? run.mod.waveMul : 1));
@@ -1585,8 +1838,9 @@ function spawnEnemy(run, kind, x, y, opts) {
   const d = ENEMY_DEFS[kind];
   const s = run.sector;
   const mod = run.mod || {};
-  const hpScale = (1 + (s - 1) * 0.17 + (run.wave - 1) * 0.02) * (mod.hpMul || 1);
-  const spdScale = (1 + (s - 1) * 0.045) * (mod.spdMul || 1);
+  const plusTier = clamp(Math.floor(Number(run.ngPlusTier) || 0), 0, 99);
+  const hpScale = (1 + (s - 1) * 0.17 + (run.wave - 1) * 0.02) * (mod.hpMul || 1) * (1 + plusTier * 0.20);
+  const spdScale = (1 + (s - 1) * 0.045) * (mod.spdMul || 1) * (1 + plusTier * 0.025);
   const affixes = opts.affixes || [];
   let hpMul = opts.small ? 0.5 : 1;
   let spdMul = 1;
@@ -1604,7 +1858,7 @@ function spawnEnemy(run, kind, x, y, opts) {
     maxHp: d.hp * hpScale * hpMul,
     speed: d.speed * spdScale * spdMul,
     aggroSpeed: d.aggroSpeed * spdScale * spdMul,
-    dmg: d.dmg * (1 + (s - 1) * 0.07) * (mod.dmgMul || 1),
+    dmg: d.dmg * (1 + (s - 1) * 0.07) * (mod.dmgMul || 1) * (1 + plusTier * 0.10),
     touchCd: 0, lit: 0, aggro: 0, hitFlash: 0, burnAcc: 0,
     wanderT: 0, wanderA: Math.random() * TAU, raging: 0, fleeing: 0,
     state: "idle", stateT: 0, pulseT: 1.4 + Math.random() * 1.6,
@@ -3132,7 +3386,8 @@ function drawHazards(run) {
 function spawnBoss(run) {
   const p = run.player;
   const b = spawnEnemy(run, "boss", CFG.ARENA_W * 0.5, CFG.WALL + 300, { spawnT: 1.6 });
-  b.hp = b.maxHp = BOSS.hp * (1 + (run.sector - 10) * 0.1);
+  const plusTier = clamp(Math.floor(Number(run.ngPlusTier) || 0), 0, 99);
+  b.hp = b.maxHp = BOSS.hp * (1 + (run.sector - 10) * 0.1) * (1 + plusTier * 0.22);
   b.boss = true;
   b.phase = 1;
   b.atkT = 2.6;
@@ -3714,33 +3969,64 @@ function sectorBrief(run) {
  * 19. MODULE SELECTION UI
  * ------------------------------------------------------------------ */
 let moduleChoices = [];
+function shuffledCopy(list) {
+  const out = list.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const value = out[i]; out[i] = out[j]; out[j] = value;
+  }
+  return out;
+}
+function renderChoiceTrail(run, wrap) {
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  const choices = run.choiceHistory || [];
+  if (!choices.length) {
+    const empty = document.createElement("span"); empty.className = "route-empty";
+    empty.textContent = "No doctrine chosen yet · this pick sets your route";
+    wrap.appendChild(empty); return;
+  }
+  for (const choice of choices.slice(-7)) {
+    const module = MODULES.find(m => m.id === choice.moduleId);
+    const branch = module && branchForModule(module);
+    if (!module || !branch) continue;
+    const chip = document.createElement("span"); chip.className = "route-chip";
+    chip.style.setProperty("--branch-color", branch.color);
+    chip.title = "Sector " + pad2(choice.sector) + " · " + branch.name + " · " + module.name;
+    chip.textContent = "S" + pad2(choice.sector) + "  " + branch.icon + " " + branch.name;
+    wrap.appendChild(chip);
+  }
+}
 function buildModuleChoices(run, bonus) {
   document.getElementById("mod-eyebrow").textContent =
-    "SALVAGE FABRICATOR — SECTOR " + run.sector + " CLEARED  ·  +" + fmt(bonus) + " PTS";
+    "SECTOR " + pad2(run.sector) + " CLEARED  ·  " + fmt(bonus) + " BONUS POINTS  ·  CHOOSE A DOCTRINE";
   const pool = MODULES.filter(m => !(m.id === "drone" && run.player.droneLevel >= 3));
-  const shuffled = pool.slice();
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const t = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = t;
-  }
-  moduleChoices = shuffled.slice(0, 3);
+  const groups = Object.keys(CHOICE_BRANCHES).map(tag => [tag, pool.filter(m => m.tag === tag)]).filter(pair => pair[1].length);
+  const selectedGroups = shuffledCopy(groups).slice(0, 3);
+  moduleChoices = selectedGroups.map(pair => pick(shuffledCopy(pair[1])));
   const wrap = document.getElementById("mod-cards");
   wrap.innerHTML = "";
   moduleChoices.forEach((m, idx) => {
+    const branch = branchForModule(m);
     const el = document.createElement("div");
     el.className = "card";
     el.tabIndex = 0;
-    el.style.setProperty("--accent", m.accent);
+    el.setAttribute("role", "button");
+    el.setAttribute("aria-label", (idx + 1) + ": " + branch.name + " branch. " + m.name + ". " + (CHOICE_COPY[m.id] || m.desc));
+    el.style.setProperty("--accent", branch.color);
+    el.dataset.branch = branch.id;
     el.innerHTML =
-      '<div class="num">0' + (idx + 1) + '</div>' +
+      '<div class="num">' + (idx + 1) + '</div>' +
       '<div class="ic">' + m.icon + '</div>' +
+      '<div class="branch-label"><span class="branch-glyph">' + branch.icon + '</span><span>' + branch.name + ' BRANCH</span></div>' +
       '<div class="nm">' + m.name + '</div>' +
-      '<p class="ds">' + m.desc + '</p>' +
-      '<div class="tg">' + m.tag + '</div>';
+      '<p class="ds">' + (CHOICE_COPY[m.id] || m.desc) + '</p>' +
+      '<div class="tg">' + branch.pitch + '</div>';
     el.addEventListener("click", () => chooseModule(idx));
     el.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); chooseModule(idx); } });
     wrap.appendChild(el);
   });
+  renderChoiceTrail(run, document.getElementById("module-route"));
   const p = run.player;
   document.getElementById("mod-stats").textContent =
     "Integrity " + Math.round(p.hp) + "/" + p.maxHp +
@@ -3754,6 +4040,7 @@ function chooseModule(idx) {
   const m = moduleChoices[idx];
   if (!m) return;
   const run = G.run;
+  recordChoice(run, m, Math.min(CFG.MAX_SECTOR, run.sector + 1), "draft");
   m.apply(run.player);
   run.player.modules.push(m.id);
   Sound.uiBig();
@@ -3769,10 +4056,10 @@ function chooseModule(idx) {
 function showBanner(run, title, sub, color, dur, small) {
   G.banner = { title, sub: sub || "", color: color || "#9fe8ff", t: 0, dur: dur || 2.0, small: !!small };
 }
-const SCREENS = ["screen-menu", "screen-how", "screen-pause", "screen-modules", "screen-over", "screen-win", "screen-hangar"];
+const SCREENS = ["screen-menu", "screen-how", "screen-pause", "screen-modules", "screen-over", "screen-win", "screen-hangar", "screen-archive"];
 let hangarTab = "arsenal";
 function openHangar() {
-  if (G.mode !== "menu" && G.mode !== "hangar") return;
+  if (!["menu", "hangar", "over", "win"].includes(G.mode)) return;
   G.mode = "hangar";
   hangarTab = "arsenal";
   showScreen("screen-hangar");
@@ -3840,6 +4127,34 @@ function renderHangar() {
     }
     const n = Object.keys(Profile.achievements).length;
     document.getElementById("hangar-note").textContent = n + " / " + ACHIEVEMENTS.length + " station citations earned. Every first-time citation grants permanent salvage.";
+  } else if (hangarTab === "themes") {
+    for (const theme of Object.values(VISUAL_THEMES)) {
+      const unlocked = !!Profile.cosmetics[theme.id];
+      const card = document.createElement("div");
+      card.className = "hangar-card achievement-card" + (unlocked ? " unlocked" : " theme-locked");
+      card.style.setProperty("--accent", theme.accent);
+      const header = document.createElement("div"); header.className = "hname";
+      header.style.display = "flex"; header.style.alignItems = "center"; header.style.gap = "12px";
+      const swatch = document.createElement("span"); swatch.className = "theme-swatch"; swatch.style.setProperty("--theme-swatch", theme.accent);
+      const label = document.createElement("span"); label.textContent = theme.name;
+      const state = document.createElement("span"); state.className = "hlvl";
+      state.textContent = unlocked ? (Profile.selectedTheme === theme.id ? "EQUIPPED" : "UNLOCKED") : "LOCKED";
+      header.append(swatch, label, state);
+      const copy = document.createElement("p"); copy.className = "hdesc";
+      copy.textContent = unlocked ? "A procedural suit, lamp, and interface palette. No assets or downloads." : "Unlock condition · " + theme.unlock + ".";
+      const button = document.createElement("button");
+      button.className = "btn ghost theme-select" + (Profile.selectedTheme === theme.id ? " active" : "");
+      button.textContent = unlocked ? (Profile.selectedTheme === theme.id ? "CURRENT PALETTE" : "EQUIP PALETTE") : "NOT YET UNLOCKED";
+      button.disabled = !unlocked;
+      button.addEventListener("click", () => {
+        if (!unlocked) return;
+        Profile.selectedTheme = theme.id; applyVisualTheme(theme.id, true); renderHangar(); Sound.ui();
+      });
+      card.append(header, copy, button); grid.appendChild(card);
+    }
+    const endingCount = Object.keys(Profile.endings).filter(id => id !== "balanced").length;
+    document.getElementById("hangar-note").textContent =
+      Object.keys(Profile.cosmetics).length + " / " + Object.keys(VISUAL_THEMES).length + " palettes unlocked · " + endingCount + " / 5 route endings discovered. Reach deeper sectors, defeat the Warden, and clear a run to unlock more.";
   } else {
     const statData = [
       ["Best score", fmt(Profile.bestScore)], ["Best rank", Profile.bestRank || "—"],
@@ -3877,6 +4192,95 @@ document.querySelectorAll("[data-hangar-tab]").forEach(b => b.addEventListener("
   hangarTab = b.getAttribute("data-hangar-tab"); renderHangar(); Sound.ui();
 }));
 
+let archiveSelectedSector = 1;
+let archiveReturnMode = "menu";
+function openArchive() {
+  if (!["menu", "hangar", "over", "win"].includes(G.mode)) return false;
+  archiveReturnMode = G.mode === "over" || G.mode === "win" ? G.mode : "menu";
+  const max = clamp(Math.max(1, Profile.bestSector), 1, CFG.MAX_SECTOR);
+  const lastSector = Profile.lastRun && Number(Profile.lastRun.sector);
+  archiveSelectedSector = Number.isFinite(lastSector) && lastSector >= 1 && lastSector <= max ? lastSector : max;
+  G.mode = "archive";
+  showScreen("screen-archive");
+  renderArchive();
+  Sound.uiBig();
+  return true;
+}
+function renderArchive() {
+  const max = clamp(Math.max(1, Profile.bestSector), 1, CFG.MAX_SECTOR);
+  archiveSelectedSector = clamp(Math.floor(Number(archiveSelectedSector) || 1), 1, max);
+  const sectors = document.getElementById("archive-sectors");
+  sectors.innerHTML = "";
+  for (let sector = 1; sector <= CFG.MAX_SECTOR; sector++) {
+    const unlocked = sector <= max;
+    const theme = THEMES[SECTOR_THEME[sector]] || THEMES.spine;
+    const card = document.createElement("button");
+    card.className = "archive-stage" + (sector === archiveSelectedSector ? " selected" : "");
+    card.style.setProperty("--stage-accent", theme.accent);
+    card.disabled = !unlocked;
+    card.setAttribute("aria-pressed", sector === archiveSelectedSector ? "true" : "false");
+    card.setAttribute("aria-label", "Sector " + sector + ", " + theme.name + (unlocked ? ", replay unlocked" : ", reach sector " + sector + " to unlock"));
+    const n = document.createElement("span"); n.className = "stage-number"; n.textContent = "SECTOR " + pad2(sector);
+    const title = document.createElement("span"); title.className = "stage-name"; title.textContent = theme.name;
+    const state = document.createElement("span"); state.className = "stage-lock"; state.textContent = unlocked ? (sector === archiveSelectedSector ? "SELECTED · REPLAY" : "REPLAY UNLOCKED") : "LOCKED · REACH S" + pad2(sector);
+    card.append(n, title, state);
+    card.addEventListener("click", () => { if (!unlocked) return; archiveSelectedSector = sector; renderArchive(); Sound.ui(); });
+    sectors.appendChild(card);
+  }
+  const sectorTheme = THEMES[SECTOR_THEME[archiveSelectedSector]] || THEMES.spine;
+  const current = document.getElementById("archive-current");
+  current.style.setProperty("--stage-accent", sectorTheme.accent);
+  current.querySelector("strong").textContent = "SECTOR " + pad2(archiveSelectedSector) + " · " + sectorTheme.name;
+  current.querySelector("span").textContent = "CHECKPOINT READY";
+  document.getElementById("archive-brief").textContent = sectorTheme.blurb + " A different station protocol rolls on each replay.";
+  const branches = document.getElementById("archive-branches");
+  branches.innerHTML = "";
+  for (const branch of BRANCH_LIST) {
+    const module = MODULES.find(m => m.id === ARCHIVE_BRANCH_MODULES[branch.id]);
+    if (!module) continue;
+    const card = document.createElement("button");
+    card.className = "archive-branch";
+    card.style.setProperty("--branch-color", branch.color);
+    card.setAttribute("aria-label", "Replay sector " + archiveSelectedSector + " with " + branch.name + " branch, " + module.name);
+    card.innerHTML = '<span class="branch-top"><span class="branch-icon">' + branch.icon + '</span>' + branch.name + ' BRANCH</span>' +
+      '<span class="branch-module">' + module.name + '</span>' +
+      '<span class="branch-copy">' + (CHOICE_COPY[module.id] || module.desc) + '</span>' +
+      '<span class="branch-cta">Launch this route →</span>';
+    card.addEventListener("click", () => startArchiveRun(archiveSelectedSector, module.id));
+    branches.appendChild(card);
+  }
+  const last = document.getElementById("archive-last-route");
+  last.innerHTML = "";
+  if (Profile.lastRun) {
+    const report = Profile.lastRun;
+    const lead = document.createElement("b"); lead.textContent = "LAST DESCENT · ";
+    const summary = document.createElement("span");
+    summary.textContent = (report.result || "RUN ENDED") + " · SECTOR " + pad2(Number(report.sector) || 1) + " · " + fmt(Number(report.kills) || 0) + " HOSTILES · " + ((report.choices || []).length) + " BRANCH PICKS";
+    last.append(lead, summary);
+    for (const choice of (report.choices || []).slice(-5)) {
+      const module = MODULES.find(m => m.id === choice.moduleId);
+      const branch = module && branchForModule(module);
+      if (!module || !branch) continue;
+      const chip = document.createElement("span"); chip.className = "history-chip";
+      chip.style.setProperty("--branch-color", branch.color); chip.style.marginLeft = "6px";
+      chip.textContent = "S" + pad2(Number(choice.sector) || 1) + " · " + branch.icon + " " + module.name;
+      last.appendChild(chip);
+    }
+  } else {
+    last.textContent = "No career route on file yet. Sector 01 is open for a first branch test.";
+  }
+  document.getElementById("archive-status").textContent =
+    "" + max + " / " + CFG.MAX_SECTOR + " checkpoints unlocked · choose a branch to launch a non-ranked replay.";
+}
+function closeArchive() {
+  if (G.mode !== "archive") return;
+  if ((archiveReturnMode === "over" || archiveReturnMode === "win") && G.run) {
+    G.mode = archiveReturnMode; showScreen("screen-" + archiveReturnMode);
+  } else {
+    toMenu();
+  }
+}
+
 function showScreen(id) {
   for (const s of SCREENS) document.getElementById(s).classList.toggle("hidden", s !== id);
   // Any key that opened a screen must not leak into the next game state
@@ -3887,6 +4291,29 @@ function showScreen(id) {
 /* ------------------------------------------------------------------ *
  * 21. RUN LIFECYCLE
  * ------------------------------------------------------------------ */
+function applyVisualTheme(themeId, persist) {
+  const theme = VISUAL_THEMES[themeId] && Profile.cosmetics[themeId] ? VISUAL_THEMES[themeId] : VISUAL_THEMES.ice;
+  Profile.selectedTheme = theme.id;
+  const root = document.documentElement;
+  root.style.setProperty("--theme-accent", theme.accent);
+  root.style.setProperty("--theme-accent-rgb", theme.rgb);
+  root.style.setProperty("--theme-glow", "rgba(" + theme.rgb + ",.24)");
+  root.style.setProperty("--theme-contrast", theme.highlight);
+  root.dataset.visualTheme = theme.id;
+  if (persist) Profile.save();
+  return theme;
+}
+function updateThemeUnlocks(run) {
+  const wasUnlocked = Object.keys(Profile.cosmetics);
+  const deepest = Math.max(Profile.bestSector, run.sector || 1);
+  if (deepest >= 3) Profile.unlockTheme("ember");
+  if (deepest >= 5) Profile.unlockTheme("verdant");
+  if (run.bossDown || Profile.has("boss")) Profile.unlockTheme("violet");
+  if (run.won && !run.archive) Profile.unlockTheme("solar");
+  const before = new Set(wasUnlocked);
+  run.newThemes = Object.keys(Profile.cosmetics).filter(id => !before.has(id));
+  return run.newThemes;
+}
 function applyArsenal(p) {
   for (const u of ARSENAL) {
     const level = Profile.lvl(u.id);
@@ -3898,10 +4325,12 @@ function applyArsenal(p) {
   for (const k in p.ammo) p.ammo[k].mag = Math.round(WEAPONS[k].mag * p.magMul);
 }
 
-function startRun() {
+function startRun(options) {
+  options = options || {};
   Sound.init(); Sound.resume();
   const seed = (Date.now() ^ Math.floor(Math.random() * 0xFFFFFF)) >>> 0;
   G.run = newRun(seed);
+  G.run.ngPlusTier = clamp(Math.floor(Number(options.ngPlusTier) || 0), 0, 99);
   applyArsenal(G.run.player);
   generateSector(G.run);
   G.mode = "playing";
@@ -3909,9 +4338,45 @@ function startRun() {
   G.timeScale = 1;
   showScreen(null);
   Input.reset();
-  showBanner(G.run, "SECTOR 1", sectorBrief(G.run), "#9fe8ff", 3.0);
+  const title = G.run.ngPlusTier ? "NEW GAME+  ·  TIER " + G.run.ngPlusTier : "SECTOR 1";
+  const subtitle = sectorBrief(G.run) + (G.run.ngPlusTier ? " · hostile scaling increased" : "");
+  showBanner(G.run, title, subtitle, G.run.theme.accent, 3.0);
   Sound.setDrone(0.12);
   Sound.uiBig();
+  return G.run;
+}
+function startNewGamePlus() {
+  if (Profile.ngPlusTier < 1) return false;
+  return startRun({ ngPlusTier: Profile.ngPlusTier });
+}
+function startArchiveRun(sector, moduleId) {
+  if (G.mode !== "archive") return false;
+  const checkpoint = Math.floor(Number(sector));
+  const unlockedThrough = clamp(Math.max(1, Profile.bestSector), 1, CFG.MAX_SECTOR);
+  if (!Number.isFinite(checkpoint) || checkpoint < 1 || checkpoint > unlockedThrough) return false;
+  const module = MODULES.find(m => m.id === moduleId);
+  const branch = branchForModule(module);
+  if (!module || !branch) return false;
+  Sound.init(); Sound.resume();
+  const seed = (Date.now() ^ Math.floor(Math.random() * 0xFFFFFF)) >>> 0;
+  G.run = newRun(seed);
+  G.run.archive = { checkpointSector: checkpoint, branchId: branch.id, moduleId: module.id };
+  G.run.sector = checkpoint;
+  G.run.clearedSectors = checkpoint - 1;
+  applyArsenal(G.run.player);
+  module.apply(G.run.player);
+  G.run.player.modules.push(module.id);
+  recordChoice(G.run, module, checkpoint, "archive");
+  generateSector(G.run);
+  G.mode = "playing";
+  G.flash = 0.7;
+  G.timeScale = 1;
+  showScreen(null);
+  Input.reset();
+  showBanner(G.run, "ARCHIVE · SECTOR " + pad2(checkpoint), branch.name + " ROUTE · " + module.name + " INSTALLED · NON-RANKED", branch.color, 3.0);
+  Sound.setDrone(0.12 + checkpoint * 0.01);
+  Sound.uiBig();
+  return G.run;
 }
 
 function rankFor(score) {
@@ -3949,31 +4414,134 @@ function renderStats(el, rows) {
     '<div class="stat"><div class="l">' + r[0] + '</div><div class="v' + (r[2] ? " amber" : "") + '">' + r[1] + '</div></div>'
   ).join("");
 }
+function newCitationIds(run) {
+  const before = new Set(run.citationsAtStart || []);
+  return ACHIEVEMENTS.filter(a => Profile.has(a.id) && !before.has(a.id)).map(a => a.id);
+}
+function runRecap(run) {
+  return {
+    result: run.archive ? (run.won ? "ARCHIVE CLEAR" : "ARCHIVE LOST") : (run.won ? "SURFACE BREAK" : "SIGNAL LOST"),
+    score: Math.round(run.score), rank: run.rank || rankFor(run.score),
+    sector: Math.floor(run.sector || 1), kills: Math.floor(run.kills || 0),
+    time: Math.floor(run.time || 0), archive: !!run.archive, ngPlusTier: run.ngPlusTier || 0,
+    ending: run.ending ? run.ending.id : "balanced",
+    choices: (run.choiceHistory || []).map(c => ({ sector: c.sector, moduleId: c.moduleId, branchId: c.branchId }))
+  };
+}
+function normalizeStoredRun(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const safeNumber = (value, fallback) => Number.isFinite(Number(value)) ? Number(value) : fallback;
+  const choices = Array.isArray(raw.choices) ? raw.choices.slice(-CFG.MAX_SECTOR).map(choice => {
+    if (!choice || typeof choice !== "object") return null;
+    const module = MODULES.find(m => m.id === String(choice.moduleId || ""));
+    if (!module) return null;
+    const branch = branchForModule(module);
+    return { sector: clamp(Math.floor(safeNumber(choice.sector, 1)), 1, CFG.MAX_SECTOR), moduleId: module.id, branchId: branch.id };
+  }).filter(Boolean) : [];
+  const endingId = ENDINGS[raw.ending] ? raw.ending : "balanced";
+  const rank = /^(S\+|S|A|B|C|D|E)$/.test(String(raw.rank || "")) ? String(raw.rank) : "E";
+  const allowedResult = ["SURFACE BREAK", "SIGNAL LOST", "ARCHIVE CLEAR", "ARCHIVE LOST"];
+  return {
+    result: allowedResult.includes(String(raw.result)) ? String(raw.result) : "RUN ENDED",
+    score: Math.max(0, Math.floor(safeNumber(raw.score, 0))), rank,
+    sector: clamp(Math.floor(safeNumber(raw.sector, 1)), 1, CFG.MAX_SECTOR),
+    kills: Math.max(0, Math.floor(safeNumber(raw.kills, 0))),
+    time: Math.max(0, Math.floor(safeNumber(raw.time, 0))),
+    archive: raw.archive === true,
+    ngPlusTier: clamp(Math.floor(safeNumber(raw.ngPlusTier, 0)), 0, 99),
+    ending: endingId, choices
+  };
+}
+function renderPostgame(prefix, run) {
+  const choicesEl = document.getElementById(prefix + "-choices");
+  const countEl = document.getElementById(prefix + "-route-count");
+  const endingEl = document.getElementById(prefix + "-ending");
+  const citationsEl = document.getElementById(prefix + "-citations");
+  const choices = run.choiceHistory || [];
+  countEl.textContent = choices.length + " decision" + (choices.length === 1 ? "" : "s");
+  choicesEl.innerHTML = "";
+  for (const choice of choices) {
+    const module = MODULES.find(m => m.id === choice.moduleId);
+    const branch = module && branchForModule(module);
+    if (!module || !branch) continue;
+    const chip = document.createElement("span"); chip.className = "history-chip";
+    chip.style.setProperty("--branch-color", branch.color);
+    chip.title = branch.name + " branch · " + module.name;
+    const sector = document.createElement("span"); sector.className = "history-sector"; sector.textContent = "S" + pad2(choice.sector);
+    const glyph = document.createElement("span"); glyph.className = "history-glyph"; glyph.textContent = branch.icon;
+    const name = document.createElement("span"); name.textContent = module.name;
+    chip.append(sector, glyph, name); choicesEl.appendChild(chip);
+  }
+  if (!choices.length) {
+    const empty = document.createElement("p"); empty.className = "review-empty";
+    empty.textContent = "No module draft reached this run. The route remains open.";
+    choicesEl.appendChild(empty);
+  }
+  const ending = run.ending || resolveEnding(run);
+  endingEl.innerHTML = "";
+  endingEl.style.setProperty("--ending-color", ending.color);
+  const endingTitle = document.createElement("strong");
+  endingTitle.textContent = (run.won ? "ENDING · " : "PROJECTED ROUTE · ") + ending.title;
+  const endingText = document.createTextNode(" " + ending.text + (run.won ? "" : " Win a full descent to discover the ending."));
+  endingEl.append(endingTitle, endingText);
+  citationsEl.innerHTML = "";
+  const fresh = new Set(newCitationIds(run));
+  const earned = ACHIEVEMENTS.filter(a => Profile.has(a.id) && fresh.has(a.id));
+  if (earned.length) {
+    for (const achievement of earned) {
+      const pill = document.createElement("span"); pill.className = "citation-pill new";
+      pill.textContent = achievement.icon + "  " + achievement.name + "  ·  +" + achievement.reward + " ¤";
+      citationsEl.appendChild(pill);
+    }
+  } else {
+    const empty = document.createElement("span"); empty.className = "review-empty";
+    empty.textContent = "No new citations this run · " + Object.keys(Profile.achievements).length + " / " + ACHIEVEMENTS.length + " career citations indexed.";
+    citationsEl.appendChild(empty);
+  }
+  for (const themeId of run.newThemes || []) {
+    const theme = VISUAL_THEMES[themeId];
+    if (!theme) continue;
+    const pill = document.createElement("span"); pill.className = "citation-pill new";
+    pill.textContent = "PALETTE UNLOCKED · " + theme.name;
+    citationsEl.appendChild(pill);
+  }
+  const blurb = document.getElementById("win-ending-blurb");
+  if (prefix === "win" && blurb) blurb.textContent = ending.text;
+}
 
 function gameOver(run) {
   if (G.mode === "over") return;
   G.mode = "over";
   run.dying = false;
   run.rank = rankFor(run.score);
+  run.ending = resolveEnding(run);
   const isBest = submitRun(run);
   document.getElementById("over-rank").textContent = run.rank;
   document.getElementById("death-line").textContent =
-    "Killed by " + (run.deathCause || "the dark") + " — " + sectorSubtitle(run.sector);
+    (run.archive ? "ARCHIVE SORTIE · " : "Killed by ") + (run.deathCause || (run.archive ? "simulation terminated" : "the dark")) + " — " + sectorSubtitle(run.sector);
   document.getElementById("over-best").classList.toggle("hidden", !isBest);
   renderStats(document.getElementById("over-stats"), statBlock(run));
+  renderPostgame("over", run);
+  refreshRecords();
   showScreen("screen-over");
   Sound.setDrone(0.04);
 }
 
-/** Idempotent record submission — aborting after death must not double-count. */
+/** Idempotent record submission — archive sorties intentionally do not farm career rewards. */
 function submitRun(run) {
   if (run.submitted) return false;
   run.rank = run.rank || rankFor(run.score);
   run.submitted = true;
-  const best = Records.submit(run);
-  if (Profile.totalSalvage >= 2000 && Profile.unlock("rich")) {
-    run.salvageAward = (run.salvageAward || 0) + 160;
+  let best = false;
+  if (!run.archive) {
+    best = Records.submit(run);
+    if (Profile.totalSalvage >= 2000 && Profile.unlock("rich")) {
+      run.salvageAward = (run.salvageAward || 0) + 160;
+    }
   }
+  updateThemeUnlocks(run);
+  Profile.lastRun = runRecap(run);
+  Profile.save();
   return best;
 }
 
@@ -3981,7 +4549,13 @@ function victory(run) {
   if (G.mode === "win") return;
   G.mode = "win";
   run.won = true;
-  Profile.unlock("win");
+  run.ending = resolveEnding(run);
+  Profile.recordEnding(run.ending.id);
+  if (!run.archive) {
+    Profile.unlock("win");
+    Profile.ngPlusTier = clamp(Math.max(Profile.ngPlusTier, (run.ngPlusTier || 0) + 1), 0, 99);
+    Profile.save();
+  }
   run.score += Math.round(5000 * run.player.scoreMul);
   run.rank = rankFor(run.score);
   Sound.victory();
@@ -3990,6 +4564,8 @@ function victory(run) {
   document.getElementById("win-rank").textContent = run.rank;
   document.getElementById("win-best").classList.toggle("hidden", !isBest);
   renderStats(document.getElementById("win-stats"), statBlock(run));
+  renderPostgame("win", run);
+  refreshRecords();
   showScreen("screen-win");
   Sound.setDrone(0.05);
 }
@@ -4011,6 +4587,13 @@ function refreshRecords() {
   const wins = document.getElementById("rec-wins");
   if (salvage) salvage.textContent = fmt(Profile.salvage);
   if (wins) wins.textContent = fmt(Profile.wins);
+  for (const id of ["btn-menu-ngplus", "btn-over-ngplus", "btn-win-ngplus"]) {
+    const button = document.getElementById(id);
+    if (!button) continue;
+    button.classList.toggle("hidden", Profile.ngPlusTier < 1);
+    const label = button.querySelector("[data-ngplus-label]");
+    if (label) label.textContent = String(Profile.ngPlusTier);
+  }
 }
 
 function togglePause(force) {
@@ -4047,13 +4630,18 @@ Game.onKey = function (code, e) {
   switch (G.mode) {
     case "menu":
       if (code === "Enter" || code === "Space" || code === "NumpadEnter") startRun();
+      else if (code === "KeyN" && Profile.ngPlusTier > 0) startNewGamePlus();
+      else if (code === "KeyA") openArchive();
       else if (code === "KeyH" || code === "Slash") { G.mode = "how"; showScreen("screen-how"); Sound.ui(); }
       break;
     case "how":
       if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyB") { G.mode = "menu"; showScreen("screen-menu"); Sound.ui(); }
       break;
     case "hangar":
-      if (code === "Escape" || code === "KeyB") { G.mode = "menu"; showScreen("screen-menu"); refreshRecords(); Sound.ui(); }
+      if (code === "Escape" || code === "KeyB") { toMenu(); Sound.ui(); }
+      break;
+    case "archive":
+      if (code === "Escape" || code === "KeyB" || code === "Backspace") { closeArchive(); Sound.ui(); }
       break;
     case "playing":
       if (code === "Escape" || code === "KeyP") togglePause(true);
@@ -4077,9 +4665,11 @@ Game.onBlur = function () {
   if (G.mode === "playing") togglePause(true);
 };
 
-document.getElementById("btn-start").addEventListener("click", startRun);
+document.getElementById("btn-start").addEventListener("click", () => startRun());
+document.getElementById("btn-menu-ngplus").addEventListener("click", startNewGamePlus);
+document.getElementById("btn-archive").addEventListener("click", openArchive);
 document.getElementById("btn-hangar").addEventListener("click", openHangar);
-document.getElementById("btn-hangar-back").addEventListener("click", () => { G.mode = "menu"; showScreen("screen-menu"); refreshRecords(); Sound.ui(); });
+document.getElementById("btn-hangar-back").addEventListener("click", () => { toMenu(); Sound.ui(); });
 document.getElementById("btn-how").addEventListener("click", () => { G.mode = "how"; showScreen("screen-how"); Sound.init(); Sound.resume(); Sound.ui(); });
 document.getElementById("btn-how-back").addEventListener("click", () => { G.mode = "menu"; showScreen("screen-menu"); Sound.ui(); });
 document.getElementById("btn-resume").addEventListener("click", () => togglePause(false));
@@ -4088,10 +4678,17 @@ document.getElementById("btn-mute").addEventListener("click", e => {
   e.currentTarget.innerHTML = "Audio: " + (on ? "On" : "Off") + ' <span class="k">M</span>';
 });
 document.getElementById("btn-abort").addEventListener("click", () => { if (G.run && G.mode === "paused") submitRun(G.run); toMenu(); });
-document.getElementById("btn-retry").addEventListener("click", startRun);
+document.getElementById("btn-retry").addEventListener("click", () => startRun());
 document.getElementById("btn-menu").addEventListener("click", toMenu);
-document.getElementById("btn-again").addEventListener("click", startRun);
+document.getElementById("btn-over-ngplus").addEventListener("click", startNewGamePlus);
+document.getElementById("btn-over-archive").addEventListener("click", openArchive);
+document.getElementById("btn-over-hangar").addEventListener("click", openHangar);
+document.getElementById("btn-again").addEventListener("click", () => startRun());
+document.getElementById("btn-win-ngplus").addEventListener("click", startNewGamePlus);
+document.getElementById("btn-win-archive").addEventListener("click", openArchive);
+document.getElementById("btn-win-hangar").addEventListener("click", openHangar);
 document.getElementById("btn-win-menu").addEventListener("click", toMenu);
+document.getElementById("btn-archive-back").addEventListener("click", closeArchive);
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden && G.mode === "playing") togglePause(true);
@@ -4706,6 +5303,7 @@ function drawEnemies(run) {
 
 function drawPlayer(run) {
   const p = run.player;
+  const palette = VISUAL_THEMES[Profile.selectedTheme] || VISUAL_THEMES.ice;
   ctx.save();
   ctx.translate(p.x, p.y);
 
@@ -4724,14 +5322,14 @@ function drawPlayer(run) {
 
   // torso
   const hurt = p.hurtFlash > 0;
-  ctx.fillStyle = hurt ? "#ff8f7a" : (p.invuln > 0 && p.dashT <= 0 ? "#7fb8e0" : "#3d5f80");
+  ctx.fillStyle = hurt ? "#ff8f7a" : (p.invuln > 0 && p.dashT <= 0 ? palette.highlight : palette.suit);
   ctx.beginPath(); ctx.arc(0, 0, p.r, 0, TAU); ctx.fill();
-  ctx.strokeStyle = hurt ? "#ffd9cc" : "#9fd8ff";
+  ctx.strokeStyle = hurt ? "#ffd9cc" : palette.accent;
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.arc(0, 0, p.r, 0, TAU); ctx.stroke();
 
   // visor
-  ctx.fillStyle = p.dashT > 0 ? "#eaffff" : "#bfe9ff";
+  ctx.fillStyle = p.dashT > 0 ? "#ffffff" : palette.highlight;
   ctx.beginPath(); ctx.ellipse(p.r * 0.34, 0, p.r * 0.44, p.r * 0.6, 0, 0, TAU); ctx.fill();
 
   // weapon
@@ -4754,7 +5352,7 @@ function drawPlayer(run) {
   if (p.dashT > 0) {
     ctx.save();
     ctx.globalAlpha = 0.5;
-    ctx.strokeStyle = "#8fe6ff"; ctx.lineWidth = 2;
+    ctx.strokeStyle = palette.accent; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(p.x, p.y, p.r + 10 + (0.17 - p.dashT) * 90, 0, TAU); ctx.stroke();
     ctx.restore();
   }
@@ -4767,9 +5365,9 @@ function drawPlayer(run) {
       ctx.save();
       ctx.translate(dx, dy);
       ctx.rotate(a * 2);
-      ctx.fillStyle = "#123024";
+      ctx.fillStyle = palette.suit;
       ctx.beginPath(); ctx.moveTo(0, -7); ctx.lineTo(6, 0); ctx.lineTo(0, 7); ctx.lineTo(-6, 0); ctx.closePath(); ctx.fill();
-      ctx.strokeStyle = "#8dffc0"; ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.strokeStyle = palette.accent; ctx.lineWidth = 1.6; ctx.stroke();
       ctx.restore();
     }
   }
@@ -4924,6 +5522,7 @@ function pointLight(x, y, r, a) {
 /** Additive pass: eyes, tracer bloom, pickup halos — drawn OVER the darkness. */
 function drawGlowPass(run) {
   const p = run.player;
+  const palette = VISUAL_THEMES[Profile.selectedTheme] || VISUAL_THEMES.ice;
   // enemy eyes always glow — fair warning without breaking the fear
   for (const e of run.enemies) {
     if (!onScreen(e.x, e.y, 60) || e.boss) continue;
@@ -5013,8 +5612,8 @@ function drawGlowPass(run) {
   // lamp volumetric haze
   if (p.lampOn) {
   const haze = ctx.createRadialGradient(p.x, p.y, 8, p.x, p.y, p.lampRange * 0.9);
-  haze.addColorStop(0, "rgba(150,215,255,.075)");
-  haze.addColorStop(1, "rgba(120,190,255,0)");
+  haze.addColorStop(0, "rgba(" + palette.rgb + ",.09)");
+  haze.addColorStop(1, "rgba(" + palette.rgb + ",0)");
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(p.x, p.y);
@@ -5094,6 +5693,7 @@ function drawPostFX(run) {
  * ------------------------------------------------------------------ */
 function drawHUD(run) {
   const p = run.player;
+  const palette = VISUAL_THEMES[Profile.selectedTheme] || VISUAL_THEMES.ice;
   const S = clamp(Math.min(VW / 1280, VH / 720), 0.72, 1.35);
   ctx.save();
   ctx.textBaseline = "alphabetic";
@@ -5116,7 +5716,7 @@ function drawHUD(run) {
   ctx.fillStyle = "rgba(150,200,235,.6)";
   ctx.font = "700 " + (10 * S).toFixed(1) + "px ui-monospace,monospace";
   ctx.fillText("ENERGY", bx, eby - 3 * S);
-  bar(bx, eby, bw * 0.78, bh * 0.62, p.energy / p.maxEnergy, "#a8d8ff", "rgba(120,190,255,.11)");
+  bar(bx, eby, bw * 0.78, bh * 0.62, p.energy / p.maxEnergy, palette.accent, "rgba(120,190,255,.11)");
 
   // ability pips
   const aby = eby + bh * 0.62 + 12 * S;
@@ -5125,7 +5725,7 @@ function drawHUD(run) {
   abilityPip(bx + 148 * S, aby, S, "RADAR", p.radarCd <= 0 && p.energy >= CFG.RADAR_COST, 1 - clamp(p.radarCd / 6, 0, 1));
   ctx.textAlign = "left";
   ctx.font = "700 " + (9.5 * S).toFixed(1) + "px ui-monospace,monospace";
-  ctx.fillStyle = p.lampOn ? "rgba(255,233,168,.9)" : "rgba(140,170,200,.5)";
+  ctx.fillStyle = p.lampOn ? palette.accent : "rgba(140,170,200,.5)";
   ctx.fillText((p.lampOn ? "◉ LAMP ON" : "○ LAMP OFF") + "  [T]", bx + 222 * S, aby + 6 * S);
   if (p.barrierT > 0 && p.barrierHp > 0) {
     ctx.fillStyle = "#c9a6ff"; ctx.textAlign = "left";
@@ -5204,6 +5804,16 @@ function drawHUD(run) {
   ctx.fillStyle = run.mod ? run.mod.color : "#9fe8ff";
   ctx.font = "700 " + (8.5 * S).toFixed(1) + "px ui-monospace,monospace";
   ctx.fillText((run.theme ? run.theme.name : "HADAL-9") + " · " + (run.mod ? run.mod.name : "STANDARD"), VW - 22 * S, 58 * S);
+  const lastChoice = run.choiceHistory && run.choiceHistory.length ? run.choiceHistory[run.choiceHistory.length - 1] : null;
+  const lastModule = lastChoice && MODULES.find(m => m.id === lastChoice.moduleId);
+  const routeBranch = lastModule && branchForModule(lastModule);
+  ctx.fillStyle = routeBranch ? routeBranch.color : palette.accent;
+  ctx.font = "800 " + (8.5 * S).toFixed(1) + "px ui-monospace,monospace";
+  ctx.fillText("ROUTE · " + (routeBranch ? routeBranch.name : "UNDECIDED"), VW - 22 * S, 76 * S);
+  if (run.archive || run.ngPlusTier > 0) {
+    ctx.fillStyle = run.archive ? "#ffd166" : "#ff9e7a";
+    ctx.fillText(run.archive ? "ARCHIVE REPLAY · NON-RANKED" : "NEW GAME+ · TIER " + run.ngPlusTier, VW - 22 * S, 92 * S);
+  }
   // core pips
   for (let i = 0; i < run.coresNeed; i++) {
     const x = VW - 22 * S - (run.coresNeed - 1 - i) * 20 * S;
@@ -5355,6 +5965,7 @@ function abilityPip(x, y, S, label, ready, frac) {
 }
 
 function drawMinimap(run, S) {
+  const palette = VISUAL_THEMES[Profile.selectedTheme] || VISUAL_THEMES.ice;
   const size = clamp(148 * S, 96, 190);
   const pad = 18 * S;
   const x = VW - size - pad, y = VH - size - pad;
@@ -5458,7 +6069,7 @@ function drawMinimap(run, S) {
   // player dot
   ctx.fillStyle = "#fff";
   ctx.beginPath(); ctx.arc(px, py, 2.8, 0, TAU); ctx.fill();
-  ctx.strokeStyle = "#9fe8ff"; ctx.lineWidth = 1;
+  ctx.strokeStyle = palette.accent; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + Math.cos(p.angle) * 9, py + Math.sin(p.angle) * 9); ctx.stroke();
   ctx.restore();
 
@@ -5484,11 +6095,12 @@ for (let i = 0; i < 9; i++) {
 }
 function renderMenuBackdrop() {
   menuFX.t += 1 / 60;
+  const palette = VISUAL_THEMES[Profile.selectedTheme] || VISUAL_THEMES.ice;
   ctx.fillStyle = "#03060d";
   ctx.fillRect(0, 0, VW, VH);
 
   // faint deck grid
-  ctx.strokeStyle = "rgba(70,120,160,.055)";
+  ctx.strokeStyle = "rgba(" + palette.rgb + ",.055)";
   ctx.lineWidth = 1;
   ctx.beginPath();
   const gs = 96;
@@ -5503,9 +6115,9 @@ function renderMenuBackdrop() {
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
   const g = ctx.createRadialGradient(cx, cy, 10, cx, cy, range);
-  g.addColorStop(0, "rgba(120,190,255,.13)");
-  g.addColorStop(0.5, "rgba(90,160,235,.05)");
-  g.addColorStop(1, "rgba(60,120,200,0)");
+  g.addColorStop(0, "rgba(" + palette.rgb + ",.14)");
+  g.addColorStop(0.5, "rgba(" + palette.rgb + ",.055)");
+  g.addColorStop(1, "rgba(" + palette.rgb + ",0)");
   ctx.fillStyle = g;
   ctx.beginPath();
   ctx.moveTo(cx, cy);
@@ -5599,6 +6211,14 @@ function frame(now) {
  * 30. BOOT
  * ------------------------------------------------------------------ */
 function boot() {
+  Profile.load();
+  // Existing careers inherit newly added post-game unlocks immediately.
+  if (Profile.bestSector >= 3) Profile.unlockTheme("ember");
+  if (Profile.bestSector >= 5) Profile.unlockTheme("verdant");
+  if (Profile.has("boss")) Profile.unlockTheme("violet");
+  if (Profile.wins > 0) Profile.unlockTheme("solar");
+  if (Profile.wins > 0 && Profile.ngPlusTier < 1) { Profile.ngPlusTier = 1; Profile.save(); }
+  applyVisualTheme(Profile.selectedTheme, false);
   resize();
   refreshRecords();
   Sound.setMusic(Profile.prefs.music);
@@ -5617,12 +6237,15 @@ function boot() {
 /** Read-only hook used by the automated QA harness (harmless in the browser). */
 window.__BP = {
   G, Input, CFG, WEAPONS, ENEMY_DEFS, MODULES, Records, Profile, ARSENAL,
-  ACHIEVEMENTS, THEMES, HAZARDS, SECTOR_MODS, AFFIXES, Sound,
+  ACHIEVEMENTS, THEMES, VISUAL_THEMES, CHOICE_BRANCHES, ENDINGS, BRANCH_LIST,
+  HAZARDS, SECTOR_MODS, AFFIXES, Sound,
+  get moduleChoices() { return moduleChoices.slice(); },
   api: {
-    startRun, update, render, generateSector, startWave, spawnEnemy, spawnBoss,
-    chooseModule, openHangar, renderHangar, applyArsenal, updateBoss, updateHazards,
-    updateAltFire, updateAchievements, updatePickups, updateHazards, teslaChain,
-    collect, damageEnemy, fireHostile,
+    startRun, startNewGamePlus, startArchiveRun, openArchive, renderArchive, closeArchive,
+    update, render, generateSector, startWave, spawnEnemy, spawnBoss,
+    chooseModule, buildModuleChoices, openHangar, renderHangar, applyArsenal, applyVisualTheme,
+    updateBoss, updateHazards, updateAltFire, updateAchievements, updatePickups, teslaChain,
+    collect, damageEnemy, fireHostile, advanceSector, resolveEnding, recordChoice, submitRun,
     togglePause, toMenu, gameOver, victory, hurtPlayer, tryFire, tryDash, tryFlare,
     killEnemy, resize, rankFor, waveComposition, sectorSubtitle, sectorBrief
   }
